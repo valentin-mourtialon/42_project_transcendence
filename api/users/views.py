@@ -1,0 +1,177 @@
+from rest_framework import viewsets
+from rest_framework import generics
+from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
+
+from tournaments.serializers import TournamentSerializer, UserTournamentInvitationSerializer
+
+from .models import Profile
+from .serializers import ProfileSerializer
+from .models import FriendInvitation
+from .serializers import FriendInvitationSerializer
+from .models import Blocked
+from .serializers import BlockedSerializer
+
+
+# ********************************************************
+#     PROFILE ViewSet
+# ********************************************************
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+    # GET: get user profile
+    def retrieve(self, request, *args, **kwargs):
+        profile = self.get_object()
+        user = request.user
+        if user != profile.user and profile not in user.profile.get_friends():
+            raise PermissionDenied()
+        return super().retrieve(request, *args, **kwargs)
+    
+    # see how to deal with block user later, but this might be used for search bar, add friend
+    # def list(self, request, *args, **kwargs):
+    #    raise PermissionDenied()
+    
+    # POST
+    def create(self, request, *args, **kwargs):
+       raise PermissionDenied()
+
+    # PUT: update user profile
+    def update(self, request, *args, **kwargs):
+        profile = self.get_object()
+        if (request.user != profile.user):
+            raise PermissionDenied()
+        return super().update(request, *args, **kwargs)
+    
+    # PATCH: update user profile
+    def partial_update(self, request, *args, **kwargs):
+        profile = self.get_object()
+        if (request.user != profile.user):
+            raise PermissionDenied()
+        return super().partial_update(request, *args, **kwargs)
+    
+    # DELETE: delete user profile
+    def destroy(self, request, *args, **kwargs):
+        profile = self.get_object()
+        if (request.user != profile.user):
+            raise PermissionDenied()
+        return super().destroy(request, *args, **kwargs)
+    
+    # GET all friends
+    @action(detail=False, methods=['get'])
+    def friends(self, request):
+        user = request.user
+        accepted_invitations = user.profile.get_accepted_invitations()
+        serializer = FriendInvitationSerializer(accepted_invitations, many=True)
+        return Response(serializer.data)
+
+    # GET all the invitations the user has sent
+    @action(detail=False, methods=['get'])
+    def sent_friend_invitations(self, request):
+        user = request.user
+        sent_invitations = user.profile.get_sent_friend_invitations()
+        serializer = FriendInvitationSerializer(sent_invitations, many=True, context={'request':request})
+        return Response(serializer.data)
+
+    # GET all the invitations the user received
+    @action(detail=False, methods=['get'])
+    def received_friend_invitations(self, request):
+        user = request.user
+        received_invitations = user.profile.get_received_friend_invitations()
+        serializer = FriendInvitationSerializer(received_invitations, many=True, context={'request':request})
+        return Response(serializer.data)
+
+    # GET all created tournaments
+    @action(detail=False, methods=['get'])
+    def created_tournaments(self, request):
+        user = request.user
+        created_tournaments = user.profile.get_created_tournaments()
+        serializer = TournamentSerializer(created_tournaments, many=True)
+        return Response(serializer.data)
+    
+    # GET all received tournament invitations
+    @action(detail=False, methods=['get'])
+    def received_tournament_invitations(self, request):
+        user = request.user
+        received_tournament_invitations = user.profile.get_received_tournament_invitations()
+        serializer = UserTournamentInvitationSerializer(received_tournament_invitations, many=True)
+        return Response(serializer.data)
+
+    # GET all accepted tournament invitations
+    @action(detail=False, methods=['get'])
+    def accepted_tournament_invitations(self, request):
+        user = request.user
+        accepted_tournament_invitations = user.profile.get_accepted_tournament_invitations()
+        serializer = UserTournamentInvitationSerializer(accepted_tournament_invitations, many=True)
+        return Response(serializer.data)
+    
+# ********************************************************
+#     FRIEND INVITATION ApiViews
+# ********************************************************
+
+# POST: to create an invitation
+class SendFriendInvitationAPIView(generics.CreateAPIView):
+    queryset = FriendInvitation.objects.all()
+    serializer_class = FriendInvitationSerializer
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+# PATCH: to accept an invitation (update status to STATUS_ACCEPTED)
+class AcceptFriendInvitationAPIView(generics.UpdateAPIView):
+    queryset = FriendInvitation.objects.all()
+    serializer_class = FriendInvitationSerializer
+
+    def get_object(self):
+        # Check if the user actually received
+        # the invitation they try to accept
+        invitation = super().get_object()
+        profile = self.request.user.profile
+        if profile != invitation.receiver:
+            raise PermissionDenied("You are not allowed to accept this invitation")
+        return invitation
+
+# DELETE: to decline an invitation
+class DeclineFriendInvitationAPIView(generics.DestroyAPIView):
+    queryset = FriendInvitation.objects.all()
+    serializer_class = FriendInvitationSerializer
+
+    def get_object(self):
+        # Check if the user actually sent/received
+        # the invitation they try to delete
+        invitation = super().get_object()
+        profile = self.request.user.profile
+        if profile != invitation.receiver and profile != invitation.sender:
+            raise PermissionDenied("You are not allowed to delete/decline this invitation")
+        return invitation
+
+# DELETE: to unfriend
+class UnfriendAPIView(generics.DestroyAPIView):
+    queryset = FriendInvitation.objects.all()
+    serializer_class = FriendInvitationSerializer
+
+    def get_object(self):
+        # Check if the user actually sent/received
+        # the invitation they try to delete
+        invitation = super().get_object()
+        profile = self.request.user.profile
+        if profile != invitation.receiver and profile != invitation.sender:
+            raise PermissionDenied("The user is not your friend")
+        return invitation
+
+
+
+
+
+
+
+# TO DO
+# ********************************************************
+#     BLOCKED ViewSet
+# ********************************************************
+
+class BlockedViewSet(viewsets.ModelViewSet):
+    queryset = Blocked.objects.all()
+    serializer_class = BlockedSerializer

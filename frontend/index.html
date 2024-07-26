@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="static/css/reset.css" />
+    <link rel="stylesheet" href="static/css/style.css" />
+    <title>ft_transcendance</title>
+  </head>
+  <body>
+    <nav class="nav">
+      <a href="/" class="nav__link" data-link>Index</a>
+      <a href="/login" class="nav__link" data-link>Login</a>
+      <a href="/register" class="nav__link" data-link>SignUp</a>
+      <a href="/user" class="nav__link" data-link>User</a>
+    </nav>
+
+    <div id="app"></div>
+
+    <template id="template-index"></template>
+
+    <template id="template-login">
+      <div class="centered-container">
+        <div class="content-container">
+          <h1>Connect to Pong</h1>
+          <form action="">
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input
+                class="form-input"
+                type="email"
+                id="email"
+                required
+                maxlength="320"
+              />
+            </div>
+            <div class="form-group">
+              <label for="password">Password:</label>
+              <input
+                class="form-input"
+                type="password"
+                id="password"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <button class="form-button">Log in</button>
+            </div>
+          </form>
+          <div class="not-registered-yet">
+            Not registered yet? <a href="/register" data-link>Register here</a>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template id="template-register">
+      <div class="centered-container">
+        <div class="content-container">
+          <h1>Register to Pong</h1>
+          <form method="POST">
+            <!-- <input type="hidden" name="csrfmiddlewaretoken" value="pcfALD13Vv2vJrURdlJNf3BCG5KHPOQycmoLhScHuOq8gJfWVHdzBhFJM6zB7V6D"/> -->
+            <div class="form-group">
+              <label for="id_username">Username:</label>
+              <input
+                type="text"
+                name="username"
+                maxlength="150"
+                required
+                aria-describedby="id_username_helptext"
+                id="id_username"
+                class="form-input"
+              />
+              <span class="helptext" id="id_username_helptext"
+                >Required. up to 150 characters. Letters, digits and @/./+/-/_
+                only.</span
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="id_email">Email:</label>
+              <input
+                type="email"
+                name="email"
+                maxlength="320"
+                required
+                id="id_email"
+                class="form-input"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="id_password1">Password:</label>
+              <input
+                type="password"
+                name="password1"
+                autocomplete="new-password"
+                required
+                aria-describedby="id_password1_helptext"
+                id="id_password1"
+                class="form-input"
+              />
+              <!-- <span class="helptext" id="id_password1_helptext"></span> -->
+              <ul class="password-instructions">
+                <li>
+                  Your password can't be too similar to your other personal
+                  information.
+                </li>
+                <li>Your password must contain at least 8 characters.</li>
+                <li>Your password can't be a commonly used password.</li>
+                <li>Your password can't be entirely numeric.</li>
+              </ul>
+            </div>
+
+            <div class="form-group">
+              <label for="id_password2">Password confirmation:</label>
+              <input
+                type="password"
+                name="password2"
+                autocomplete="new-password"
+                required
+                aria-describedby="id_password2_helptext"
+                id="id_password2"
+                class="form-input"
+              />
+              <span class="helptext" id="id_password2_helptext"
+                >Enter the same password as before, for verification.</span
+              >
+            </div>
+
+            <button class="form-button" type="submit">Sign up</button>
+          </form>
+          <div class="already-have-account">
+            Already have an account? <a href="/login" data-link>Log in now</a>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template id="template-user-home">
+      <div class="centered-container">
+        <div class="content-container">
+          <div class="welcome-user-banner">
+            <img
+              id="user-avatar"
+              class="welcome-user-banner__avatar"
+              src=""
+              alt="User avatar"
+            />
+            <div class="welcome-user-banner__infos">
+              <h1
+                id="user-welcome-message"
+                class="welcome-user-banner__infos__welcome"
+              ></h1>
+              <div class="welcome-user-banner__infos__profile">
+                <p
+                  id="user-welcome-nickname"
+                  class="welcome-user-banner__infos__nick"
+                ></p>
+                <a href="/profile" data-link>Update profile</a>
+              </div>
+            </div>
+          </div>
+          <div class="user-stats-resume">
+            <h2 class="user-stats-resume__title">Your stats resume</h2>
+            <div class="user-stats-resume__boxes">
+              <div class="user-stats-resume__box">
+                <div class="user-stats-resume__box__title">Ratio</div>
+                <p class="user-stats-resume__box__stats" id="user-ratio"></p>
+              </div>
+              <div class="user-stats-resume__box">
+                <div class="user-stats-resume__box__title">Wins</div>
+                <p class="user-stats-resume__box__stats" id="user-wins"></p>
+              </div>
+              <div class="user-stats-resume__box">
+                <div class="user-stats-resume__box__title">Losses</div>
+                <p class="user-stats-resume__box__stats" id="user-losses"></p>
+              </div>
+            </div>
+          </div>
+          <div class="tournaments-container">
+            <div class="tournaments-header">
+              <h2>Tournaments and Games</h2>
+              <button id="create-tournament" class="btn-create-tournament">
+                + Create tournament
+              </button>
+            </div>
+
+            <div class="tournaments-tabs">
+              <button class="tab-btn active" data-tab="my-tournaments">
+                My tournaments
+              </button>
+              <button class="tab-btn" data-tab="accepted-tournaments">
+                Accepted tournaments
+              </button>
+              <button class="tab-btn" data-tab="pending-invitations">
+                Pending invitations
+              </button>
+            </div>
+
+            <div class="tournaments-list" id="tournaments-list">
+              <!-- TOURNAMENTS DYNAMICALLY ADDED HERE -->
+            </div>
+          </div>
+          <!-- <div class="friends-container">
+            <h2>Friends</h2>
+            <nav class="user-home-nav">
+              <a href="/tournaments" class="nav-button" data-link>
+              <span class="nav-text">Tournaments and games</span>
+              <span class="nav-arrow">→</span>
+            </a>
+              <a href="/friends" class="nav-button" data-link>
+                <span class="nav-text">Friends</span>
+                <span class="nav-arrow">→</span>
+              </a>
+            </nav>
+          </div> -->
+        </div>
+      </div>
+    </template>
+
+    <template id="template-tournament">
+      <div class="tournament-item">
+        <div class="tournament-infos">
+          <div class="tournament-infos__header">
+            <h3 class="tournament-name"></h3>
+            <p class="tournament-status"></p>
+            <p class="tournament-number-players"></p>
+          </div>
+          <p class="tournament-created-by"></p>
+        </div>
+        <div class="tournament-actions">
+          <button class="tournament-action"></button>
+        </div>
+      </div>
+    </template>
+
+    <template id="template-404-not-found">
+      <h1>Error</h1>
+      <h3>404 not found</h3>
+    </template>
+
+    <script type="module" src="/static/js/index.js"></script>
+  </body>
+</html>
