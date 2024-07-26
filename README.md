@@ -1,4 +1,6 @@
-# Pong game web app
+# Pong game (web app)
+
+It's the last 42 school common core project
 
 ## Project Architecture
 
