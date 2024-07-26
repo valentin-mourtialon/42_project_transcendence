@@ -16,6 +16,7 @@ The entire application is containerized using Docker.
 
 ### Directory Structure
 
+```
 /
 ├── frontend/
 │ └── static/
@@ -28,6 +29,7 @@ The entire application is containerized using Docker.
 │ ├── Dockerfile
 │ └── nginx.conf
 └── docker-compose.yml
+```
 
 ## Configuration Details
 
