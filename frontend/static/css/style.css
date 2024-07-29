@@ -51,6 +51,20 @@ h3 {
   letter-spacing: -0.015em;
 }
 
+.page-content-padding {
+  padding-top: 5vh;
+}
+@media screen and (min-width: 768px) {
+  .page-content-padding {
+    padding-top: 8vh;
+  }
+}
+@media screen and (min-width: 1024px) {
+  .page-content-padding {
+    padding-top: 10vh;
+  }
+}
+
 a {
   color: var(--active);
   text-decoration: none;
@@ -85,7 +99,7 @@ body {
 }
 
 .content-container {
-  flex-basis: 600px;
+  flex-basis: 632px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -179,7 +193,7 @@ form {
   /* border: 1px solid var(--debug-green); */
 }
 .welcome-user-banner__avatar {
-  width: 80px;
+  width: 72px;
   object-fit: contain;
   border-radius: 50%;
 }

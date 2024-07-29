@@ -32,7 +32,7 @@ function updateWelcomeMessage(profile) {
   const userNickname = document.getElementById("user-welcome-nickname");
   if (welcomeUsername && userNickname) {
     welcomeUsername.textContent = `Welcome back, ${profile.username}!`;
-    userNickname.textContent = `${profile.alias}`;
+    userNickname.textContent = `«${profile.alias}»`;
   }
 }
 
