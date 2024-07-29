@@ -6,32 +6,46 @@ function setupLoginForm() {
   if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const username = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+      const username = document.getElementById("login-username").value;
+      const password = document.getElementById("login-password").value;
 
-      try {
-        const response = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        });
+      const loginResult = await loginUser(username, password);
 
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem("access", data.access);
-          localStorage.setItem("refresh", data.refresh);
-          const userId = data.user_id; // [TODO] Ensure that the API send back the user ID
-          navigateToUserPage(userId);
-        } else {
-          // [TODO] GIVE USER ERRORS FEEDBACKS
-          console.error("Login failed");
-        }
-      } catch (error) {
-        console.error("Error during login:", error);
+      if (loginResult.success) {
+        console.log("User logged in successfully.");
+        navigateToUserPage(loginResult.userId);
+      } else {
+        console.error("Login failed");
+        navigateTo("/login");
       }
     });
+  }
+}
+
+async function loginUser(username, password) {
+  try {
+    const response = await fetch("/api/auth/login/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      localStorage.setItem("access", data.access);
+      localStorage.setItem("refresh", data.refresh);
+      localStorage.setItem("userId", data.user_id);
+      return { success: true, userId: data.user_id };
+    } else {
+      console.error("Login failed");
+      // [TODO] GIVE USER ERRORS FEEDBACKS
+      return { success: false };
+    }
+  } catch (error) {
+    console.error("Error during login:", error);
+    // [TODO] GIVE USER ERRORS FEEDBACKS
+    return { success: false };
   }
 }
 
@@ -40,22 +54,24 @@ function setupRegisterForm() {
   if (registerForm) {
     registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const username = document.getElementById("id_username").value;
-      const email = document.getElementById("id_email").value;
-      const password1 = document.getElementById("id_password1").value;
-      const password2 = document.getElementById("id_password2").value;
+      const username = document.getElementById("register-username").value;
+      const email = document.getElementById("register-email").value;
+      const password = document.getElementById("register-password").value;
+      const password_confirmation = document.getElementById(
+        "register-password-confirmation"
+      ).value;
 
-      if (password1 !== password2) {
+      if (password !== password_confirmation) {
         console.error("Passwords do not match");
         // [TODO] GIVE USER ERRORS FEEDBACKS
         return;
       }
 
       const requestBody = {
-        username: username,
-        email: email,
-        password: password1,
-        password_confirmation: password2,
+        username,
+        email,
+        password,
+        password_confirmation,
       };
 
       console.log("Sending registration request with data:", requestBody);
@@ -73,8 +89,18 @@ function setupRegisterForm() {
         console.log("Server response:", response.status, responseData);
 
         if (response.ok) {
-          // [TODO] LOG THE USER IN AFTER A SUCCESSFULL REGISTRATION
-          console.log("You are well registered");
+          console.log("Success: you are registered !");
+
+          // Try to automatically log in
+          const loginResult = await loginUser(username, password);
+
+          if (loginResult.success) {
+            console.log("User logged in successfully after registration");
+            navigateToUserPage(loginResult.userId);
+          } else {
+            console.error("Automatic login failed after registration");
+            navigateTo("/login");
+          }
         } else {
           // [TODO] GIVE USER ERRORS FEEDBACKS
           console.error("Registration failed", response);

@@ -14,6 +14,7 @@ function initTournamentsComponent() {
 async function loadHomePage(userId) {
   try {
     const profile = await mockFetch(`/api/profile/${userId}`);
+    console.log(`/api/profile/${userId}`);
     if (profile) {
       updateWelcomeMessage(profile);
       updateUserStats(profile);

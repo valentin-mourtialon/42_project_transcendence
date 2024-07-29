@@ -4,6 +4,12 @@ import {
 } from "./views/userHomeView.js";
 import { setupLoginForm, setupRegisterForm } from "./auth.js";
 
+function getUserIdFromLocalStorage() {
+  const token = localStorage.getItem("access");
+  if (!token) return null;
+  return localStorage.getItem("userId");
+}
+
 const isAuthenticated = () => {
   return !!localStorage.getItem("access");
 };
@@ -13,12 +19,12 @@ const router = async () => {
     { path: "/", templateId: "template-index", requiresAuth: false },
     { path: "/login", templateId: "template-login", requiresAuth: false },
     { path: "/register", templateId: "template-register", requiresAuth: false },
-    { path: "/user", templateId: "template-user-home", requiresAuth: true },
+    { path: "/user/:id", templateId: "template-user-home", requiresAuth: true },
   ];
 
   if (location.pathname === "/") {
     if (isAuthenticated()) {
-      const userId = getUserIdFromToken();
+      const userId = getUserIdFromLocalStorage();
       if (userId) {
         navigateTo(`/user/${userId}`);
         return;

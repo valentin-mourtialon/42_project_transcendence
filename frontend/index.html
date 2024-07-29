@@ -3,17 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="static/css/reset.css" />
-    <link rel="stylesheet" href="static/css/style.css" />
+    <link rel="stylesheet" href="/static/css/reset.css" />
+    <link rel="stylesheet" href="/static/css/style.css" />
     <title>ft_transcendance</title>
   </head>
   <body>
-    <nav class="nav">
+    <!-- <nav class="nav">
       <a href="/" class="nav__link" data-link>Index</a>
       <a href="/login" class="nav__link" data-link>Login</a>
       <a href="/register" class="nav__link" data-link>SignUp</a>
       <a href="/user" class="nav__link" data-link>User</a>
-    </nav>
+    </nav> -->
 
     <div id="app"></div>
 
@@ -23,23 +23,23 @@
       <div class="centered-container">
         <div class="content-container">
           <h1>Connect to Pong</h1>
-          <form action="">
+          <form method="POST" id="login-form">
             <div class="form-group">
-              <label for="email">Email:</label>
+              <label for="login-username">Username:</label>
               <input
+                type="text"
                 class="form-input"
-                type="email"
-                id="email"
+                id="login-username"
                 required
                 maxlength="320"
               />
             </div>
             <div class="form-group">
-              <label for="password">Password:</label>
+              <label for="login-password">Password:</label>
               <input
                 class="form-input"
                 type="password"
-                id="password"
+                id="login-password"
                 required
               />
             </div>
@@ -61,46 +61,46 @@
           <form method="POST" id="register-form">
             <!-- <input type="hidden" name="csrfmiddlewaretoken" value="pcfALD13Vv2vJrURdlJNf3BCG5KHPOQycmoLhScHuOq8gJfWVHdzBhFJM6zB7V6D"/> -->
             <div class="form-group">
-              <label for="id_username">Username:</label>
+              <label for="register-username">Username*:</label>
               <input
                 type="text"
                 name="username"
                 maxlength="150"
                 required
-                aria-describedby="id_username_helptext"
-                id="id_username"
+                aria-describedby="register-username-helptext"
+                id="register-username"
                 class="form-input"
               />
-              <span class="helptext" id="id_username_helptext"
+              <span class="helptext" id="register-username-helptext"
                 >Required. up to 150 characters. Letters, digits and @/./+/-/_
                 only.</span
               >
             </div>
 
             <div class="form-group">
-              <label for="id_email">Email:</label>
+              <label for="register-email">Email:</label>
               <input
                 type="email"
                 name="email"
                 maxlength="320"
                 required
-                id="id_email"
+                id="register-email"
                 class="form-input"
               />
             </div>
 
             <div class="form-group">
-              <label for="id_password1">Password:</label>
+              <label for="register-password">Password*:</label>
               <input
                 type="password"
-                name="password1"
+                name="password"
                 autocomplete="new-password"
                 required
-                aria-describedby="id_password1_helptext"
-                id="id_password1"
+                aria-describedby="register-password-helptext"
+                id="register-password"
                 class="form-input"
               />
-              <!-- <span class="helptext" id="id_password1_helptext"></span> -->
+              <!-- <span class="helptext" id="register-password-helptext"></span> -->
               <ul class="password-instructions">
                 <li>
                   Your password can't be too similar to your other personal
@@ -113,17 +113,21 @@
             </div>
 
             <div class="form-group">
-              <label for="id_password2">Password confirmation:</label>
+              <label for="register-password-confirmation"
+                >Password confirmation*:</label
+              >
               <input
                 type="password"
-                name="password2"
+                name="password-confirmation"
                 autocomplete="new-password"
                 required
-                aria-describedby="id_password2_helptext"
-                id="id_password2"
+                aria-describedby="register-password-confirmation-helptext"
+                id="register-password-confirmation"
                 class="form-input"
               />
-              <span class="helptext" id="id_password2_helptext"
+              <span
+                class="helptext"
+                id="register-password-confirmation-helptext"
                 >Enter the same password as before, for verification.</span
               >
             </div>
