@@ -4,10 +4,12 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
+from games.models import UserGame
+from games.serializers import UserGameSerializer
 from tournaments.serializers import TournamentSerializer, UserTournamentInvitationSerializer
 
 from .models import Profile
-from .serializers import ProfileSerializer
+from .serializers import FriendshipSerializer, ProfileSerializer
 from .models import FriendInvitation
 from .serializers import FriendInvitationSerializer
 from .models import Blocked
@@ -30,9 +32,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
             raise PermissionDenied()
         return super().retrieve(request, *args, **kwargs)
     
-    # see how to deal with block user later, but this might be used for search bar, add friend
-    # def list(self, request, *args, **kwargs):
-    #    raise PermissionDenied()
+    # GET list of profiles (remove the profile the user has blocked, the user themselves)
+    def list(self, request, *args, **kwargs):
+        blocker_user = request.user.profile
+        blocked_user_ids = Blocked.objects.filter(blocker=blocker_user).values_list('blocked_id', flat=True)
+        blocked_by_ids = Blocked.objects.filter(blocked=blocker_user).values_list('blocker_id', flat=True)
+        excluded_ids = [blocker_user.id] + list(blocked_user_ids) + list(blocked_by_ids)
+        queryset = self.queryset.exclude(id__in=excluded_ids)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data) 
     
     # POST
     def create(self, request, *args, **kwargs):
@@ -60,15 +68,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
     
     # GET all friends
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], url_path='friends')
     def friends(self, request):
         user = request.user
         accepted_invitations = user.profile.get_accepted_invitations()
-        serializer = FriendInvitationSerializer(accepted_invitations, many=True)
+        serializer = FriendshipSerializer(accepted_invitations, many=True, context={'request': request})
         return Response(serializer.data)
 
     # GET all the invitations the user has sent
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], url_path='sent-friend-invitations')
     def sent_friend_invitations(self, request):
         user = request.user
         sent_invitations = user.profile.get_sent_friend_invitations()
@@ -76,7 +84,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     # GET all the invitations the user received
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], url_path='received-friend-invitations')
     def received_friend_invitations(self, request):
         user = request.user
         received_invitations = user.profile.get_received_friend_invitations()
@@ -84,7 +92,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     # GET all created tournaments
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], url_path='created-tournaments')
     def created_tournaments(self, request):
         user = request.user
         created_tournaments = user.profile.get_created_tournaments()
@@ -92,7 +100,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     # GET all received tournament invitations
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], url_path='received-tournament-invitations')
     def received_tournament_invitations(self, request):
         user = request.user
         received_tournament_invitations = user.profile.get_received_tournament_invitations()
@@ -100,11 +108,19 @@ class ProfileViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     # GET all accepted tournament invitations
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], url_path='accepted-tournament-invitations')
     def accepted_tournament_invitations(self, request):
         user = request.user
         accepted_tournament_invitations = user.profile.get_accepted_tournament_invitations()
         serializer = UserTournamentInvitationSerializer(accepted_tournament_invitations, many=True)
+        return Response(serializer.data)
+    
+    # GET game history with opponent
+    @action(detail=False, methods=['get'], url_path='game-history')
+    def game_history(self, request):
+        user = request.user
+        games = user.profile.get_game_history()
+        serializer = UserGameSerializer(games, many=True)
         return Response(serializer.data)
     
 # ********************************************************
@@ -130,7 +146,7 @@ class AcceptFriendInvitationAPIView(generics.UpdateAPIView):
         invitation = super().get_object()
         profile = self.request.user.profile
         if profile != invitation.receiver:
-            raise PermissionDenied("You are not allowed to accept this invitation")
+            raise PermissionDenied("You did not receive this invitation")
         return invitation
 
 # DELETE: to decline an invitation
@@ -162,16 +178,27 @@ class UnfriendAPIView(generics.DestroyAPIView):
         return invitation
 
 
-
-
-
-
-
-# TO DO
 # ********************************************************
-#     BLOCKED ViewSet
+#     BLOCKED APIView
 # ********************************************************
 
-class BlockedViewSet(viewsets.ModelViewSet):
+# POST: to block a friend
+class BlockFriendAPIView(generics.CreateAPIView):
     queryset = Blocked.objects.all()
     serializer_class = BlockedSerializer
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+# DELETE: to unblock
+class UnblockFriendAPIView(generics.DestroyAPIView):
+    queryset = Blocked.objects.all()
+    serializer_class = BlockedSerializer
+
+# GET: get the lists of all the friends the user has blocked
+class BlockedListAPIView(generics.ListAPIView):
+    queryset = Blocked.objects.all()
+    serializer_class = BlockedSerializer
+
+    def get_queryset(self):
+        return Blocked.objects.filter(blocker=self.request.user.profile)

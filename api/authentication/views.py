@@ -1,12 +1,7 @@
-from rest_framework import viewsets
+from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from .serializers import RegistrationSerializer
 
-class RegistrationViewSet(viewsets.ModelViewSet):
+class RegistrationAPIView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
-
-    # Allow only POST requests
-    http_method_names = ['post']
-
-    # Allow user without them being authenticated
     permission_classes = [AllowAny]

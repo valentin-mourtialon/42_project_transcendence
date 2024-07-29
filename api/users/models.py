@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from transcendence.utils.constants import INVITATION_STATUS_CHOICES, STATUS_ACCEPTED, STATUS_PENDING, STATUS_DECLINED
+from transcendence.utils.constants import INVITATION_STATUS_CHOICES, STATUS_ACCEPTED, STATUS_PENDING
+from django.core.exceptions import ValidationError
 
 # ********************************************************
 #     USER / PROFILE Models
@@ -15,6 +16,17 @@ class Profile(models.Model):
     wins = models.IntegerField(default=0)
     losses = models.IntegerField(default=0)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+
+    def get_friends(self):
+        from .models import FriendInvitation
+        friend_invitations = FriendInvitation.objects.filter(models.Q(sender=self, status=STATUS_ACCEPTED) | models.Q(receiver=self, status=STATUS_ACCEPTED))
+        friends = []
+        for friend_invitation in friend_invitations:
+            if friend_invitation.sender == self:
+                friends.append(friend_invitation.receiver)
+            else:
+                friends.append(friend_invitation.sender)
+        return friends
 
     def get_accepted_invitations(self):
         from .models import FriendInvitation
@@ -45,6 +57,10 @@ class Profile(models.Model):
         from tournaments.models import UserTournamentInvitation
         received_tournament_invitations = UserTournamentInvitation.objects.filter(user=self, status=STATUS_PENDING)
         return received_tournament_invitations
+    
+    def get_game_history(self):
+        user_games = self.user_games.all()
+        return user_games
 
     def __str__(self):
         return self.user.username
@@ -58,6 +74,28 @@ class FriendInvitation(models.Model):
     receiver = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='received_friend_invitations')
     status = models.CharField(max_length=20, choices=INVITATION_STATUS_CHOICES)
 
+    #oce: block possible only you are friends
+    @classmethod
+    def are_friends(cls, user, friend):
+        is_friend =  cls.objects.filter(
+            models.Q(sender=user) & models.Q(receiver=friend) & models.Q(status=STATUS_ACCEPTED) |
+            models.Q(sender=friend) & models.Q(receiver=user) & models.Q(status=STATUS_ACCEPTED)
+        )
+        if is_friend.exists():
+            return True
+        raise ValidationError("You are not friend with that user")
+
+    @classmethod
+    def delete_invitation(cls, user, friend):
+        try:
+            invitation = cls.objects.get(sender=user, receiver=friend)
+        except cls.DoesNotExist:
+            try:
+                invitation = cls.objects.get(sender=friend, receiver=user)
+            except cls.DoesNotExist:
+                raise ValidationError("Invitation does not exist")
+        invitation.delete()
+
     # Protection to prevent duplicate invitation
     @classmethod
     def is_duplicate(cls, sender, receiver, status):
@@ -65,6 +103,15 @@ class FriendInvitation(models.Model):
             (models.Q(sender=sender, receiver=receiver, status=status)) |
             (models.Q(sender=receiver, receiver=sender, status=status))
         ).exists()
+    
+    @classmethod
+    def validate(cls, sender, receiver):
+        if (sender.id == receiver.id):
+            raise ValidationError("You cannot send an invitation to yourself")
+        if (FriendInvitation.is_duplicate(sender, receiver, STATUS_PENDING)):
+            raise ValidationError("Invitation already exists")
+        elif (FriendInvitation.is_duplicate(sender, receiver, STATUS_ACCEPTED)):
+            raise ValidationError("You are already friend with that user")  
 
     # Double protection to prevent duplicate invitation
     class Meta:
@@ -72,12 +119,10 @@ class FriendInvitation(models.Model):
             models.UniqueConstraint(fields=['sender', 'receiver'], name='unique_friend_invitation')
         ]
 
-# TO DO
 # ********************************************************
 #     BLOCKED Model
 # ******************************************************** 
 
-# We will use to know if can do an action (send friend invitation, tournament invitation, a message)
 class Blocked(models.Model):
     blocker = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='blocker_blocked_users')
     blocked = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='blocked_users')

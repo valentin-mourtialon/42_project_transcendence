@@ -4,6 +4,8 @@ from .models import Profile
 from .models import FriendInvitation
 from .models import Blocked
 from transcendence.utils.constants import STATUS_ACCEPTED, STATUS_PENDING
+from django.core.exceptions import ValidationError
+
 
 
 # ********************************************************
@@ -36,6 +38,20 @@ class FriendSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ['id', 'display_name', 'avatar']
 
+class FriendshipSerializer(serializers.ModelSerializer):
+    friend = serializers.SerializerMethodField()
+    class Meta:
+        model = FriendInvitation
+        fields = ['id', 'friend']
+    
+    def get_friend(self, instance):
+        user = self.context['request'].user.profile
+        if instance.sender.id != user.id:
+            friend_serializer = FriendSerializer(instance.sender)
+            return friend_serializer.data
+        friend_serializer = FriendSerializer(instance.receiver)
+        return friend_serializer.data
+ 
 class FriendInvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendInvitation
@@ -44,16 +60,18 @@ class FriendInvitationSerializer(serializers.ModelSerializer):
     
     # POST: to create an invitation
     def create(self, validated_data):
+        
+        # Check if the invitation is correct
         sender = self.context['request'].user.profile
         receiver = validated_data['receiver']
         validated_data['sender'] = sender
+        try:
+            FriendInvitation.validate(sender, receiver)
+        except ValidationError as e:
+            raise serializers.ValidationError(e.message)
+
+        # Create the invitation
         validated_data['status'] = STATUS_PENDING
-        if (sender.id == receiver.id):
-            raise serializers.ValidationError("You cannot send an invitation to yourself")
-        if (FriendInvitation.is_duplicate(sender, receiver, STATUS_PENDING)):
-            raise serializers.ValidationError("Invitation already exists")
-        elif (FriendInvitation.is_duplicate(sender, receiver, STATUS_ACCEPTED)):
-            raise serializers.ValidationError("You are already friend with that user")  
         return super().create(validated_data)
         
     # PATCH: to accept an invitation (update status to STATUS_ACCEPTED)
@@ -72,15 +90,46 @@ class FriendInvitationSerializer(serializers.ModelSerializer):
         representation['sender'] = sender_serializer.data
         return representation
 
-# TO DO
 # ********************************************************
 #     BLOCKED Serializer
 # ********************************************************
 
-class BlockedSerializer(serializers.Serializer):
+class BlockedSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Blocked
-        fields = '__all__'
+        fields = ['id', 'blocker', 'blocked']
+        read_only_fields = ['id', 'blocker']
+
+    # POST: to block a friend
+    def create(self, validated_data):
+        
+        # Check if the user is actually friend with that person
+        # And if it does exist, delete the invitation
+        blocker = self.context['request'].user.profile
+        blocked = validated_data['blocked']
+        validated_data['blocker'] = blocker
+        try:
+            FriendInvitation.are_friends(blocker, blocked)
+            FriendInvitation.delete_invitation(blocker, blocked)
+        except ValidationError as e:
+            raise serializers.ValidationError(e.message)
+    
+        # Create the blocked item
+        return super().create(validated_data)
+    
+
+    # GET: put all info
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        blocker_serializer = FriendSerializer(instance.blocker)
+        representation['blocker'] = blocker_serializer.data
+        blocked_serializer = FriendSerializer(instance.blocked)
+        representation['blocked'] = blocked_serializer.data
+        return representation
+
+
+
 
 
 

@@ -1,6 +1,4 @@
 from rest_framework import serializers
-from games.models import Game, UserGame
-from transcendence.utils.constants import STATUS_ACCEPTED
 from users.models import Profile
 from users.serializers import FriendSerializer
 from .models import Tournament
@@ -33,13 +31,8 @@ class CreateTournamentSerializer(serializers.ModelSerializer):
     # POST: to create a tournament
     def create(self, validated_data):
         players = validated_data.pop('players', [])
-
-        # Create the tournament instance
-        tournament = Tournament.objects.create(**validated_data)
-
-        # Create all user tournament instances
-        for player in players:
-            UserTournamentInvitation.objects.create(user=player, tournament=tournament)
+        
+        tournament = Tournament.create(players, validated_data)
 
         return tournament
 
@@ -50,7 +43,6 @@ class CreateTournamentSerializer(serializers.ModelSerializer):
 
 # to do: put protection here later probably, like if no one accepted
 # also a protection in front, like you can't start if not at least two accepted
-# TO DO: add the creator
 # protection, not start again (but front will block by removing button (start tournament))
 class StartTournamentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -59,30 +51,9 @@ class StartTournamentSerializer(serializers.ModelSerializer):
 
     # PUT: to start a tournament
     def update(self, instance, validated_data):
-
-        # Update tournament status to IN PROGRESS
-        instance.status = Tournament.STATUS_IN_PROGRESS
-
-        # Get all the players
-        players = list(UserTournamentInvitation.objects.filter(
-            tournament=instance, 
-            status=STATUS_ACCEPTED
-        ))
+        # Start the tournament
         creator = self.context['request'].user.profile
-        
-        # Create the games
-        for i in range(len(players)):
-            for j in range(i+1, len(players)):
-                game = Game.objects.create(tournament=instance)
-                UserGame.objects.create(user=players[i].user, game=game)
-                UserGame.objects.create(user=players[j].user, game=game)
-
-        for i in range(len(players)):
-            game = Game.objects.create(tournament=instance)
-            UserGame.objects.create(user=creator, game=game)
-            UserGame.objects.create(user=players[i].user, game=game)
-
-        instance.save()
+        instance.start(creator)
         return instance
 
 # ********************************************************

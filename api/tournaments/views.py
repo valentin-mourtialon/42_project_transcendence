@@ -1,6 +1,8 @@
 from rest_framework import viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from games.serializers import UserGameSerializer
 from .models import Tournament
 from .serializers import CreateTournamentSerializer, StartTournamentSerializer, TournamentSerializer
 from .models import UserTournamentInvitation
@@ -16,10 +18,17 @@ class TournamentViewSet(viewsets.ModelViewSet):
     serializer_class = TournamentSerializer
 
     # GET all tournament invitations
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], url_path='tournament-invitations')
     def tournament_invitations(self, request, pk=None):
         invitations = Tournament.get_tournament_invitations(pk)
         serializer = UserTournamentInvitationSerializer(invitations, many=True)
+        return Response(serializer.data)
+    
+    # GET user games
+    @action(detail=True, methods=['get'], url_path='user-games')
+    def user_games(self, request, pk=None):
+        games = Tournament.get_user_games(pk)
+        serializer = UserGameSerializer(games, many=True)
         return Response(serializer.data)
     
 # ********************************************************

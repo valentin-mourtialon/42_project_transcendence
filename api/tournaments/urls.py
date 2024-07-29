@@ -4,11 +4,12 @@ from .views import CreateTournamentAPIView, StartTournamentAPIView, TournamentVi
 # from .views import UserTournamentViewSet
 
 router = DefaultRouter()
-router.register(r'tournament', TournamentViewSet, basename='tournament')
+router.register(r'', TournamentViewSet, basename='tournament')
 # router.register(r'', UserTournamentViewSet, basename='user_tournament')
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('tournament/create/', CreateTournamentAPIView.as_view(), name='create-tournament'),
-    path('tournament/<int:pk>/start/', StartTournamentAPIView.as_view(), name='start-tournament'),
+    # to do: based on what we want, we might reinclude 1st and 2nd path inside model view set
+    path('tournaments/create', CreateTournamentAPIView.as_view(), name='create-tournament'),
+    path('tournaments/<int:pk>/start', StartTournamentAPIView.as_view(), name='start-tournament'),
+    path('tournaments/', include(router.urls)),
 ]

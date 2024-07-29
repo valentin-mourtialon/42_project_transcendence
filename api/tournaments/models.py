@@ -1,6 +1,6 @@
 from django.db import models
 from users.models import Profile
-from transcendence.utils.constants import INVITATION_STATUS_CHOICES, STATUS_PENDING
+from transcendence.utils.constants import INVITATION_STATUS_CHOICES, STATUS_ACCEPTED, STATUS_PENDING
 
 # ********************************************************
 #       TOURNAMENT Model
@@ -11,13 +11,11 @@ class Tournament(models.Model):
         ('REMOTE', 'Remote'),
         ('LOCAL', 'Local')
     ]
-
     STATUS_IN_PREPARATION = 'IN_PREPARATION'
     STATUS_IN_PROGRESS =  'IN_PROGRESS'
     STATUS_COMPLETED = 'COMPLETED'
-
     TOURNAMENT_STATUS_CHOICES = [
-        (STATUS_IN_PREPARATION, 'In preparationn'),
+        (STATUS_IN_PREPARATION, 'In preparation'),
         (STATUS_IN_PROGRESS, 'In progress'),
         (STATUS_COMPLETED, 'Completed'),
     ]
@@ -31,6 +29,49 @@ class Tournament(models.Model):
     def get_tournament_invitations(self):
         tournament_invitations = UserTournamentInvitation.objects.select_related('user').filter(tournament=self)
         return tournament_invitations
+    
+    @classmethod
+    def create(cls, players, validated_data):
+
+        # Create the tournament instance
+        tournament = cls.objects.create(**validated_data)
+
+        # Create all user tournament instances
+        for player in players:
+            UserTournamentInvitation.objects.create(user=player, tournament=tournament)
+        
+        return tournament
+
+    def start(self, creator):
+        from games.models import Game, UserGame
+
+        # Update tournament status to IN PROGRESS
+        self.status = self.STATUS_IN_PROGRESS
+
+        # Get all the players
+        players = list(UserTournamentInvitation.objects.filter(
+            tournament=self, 
+            status=STATUS_ACCEPTED
+        ))
+        
+        # Create the games
+        for i in range(len(players)):
+            for j in range(i+1, len(players)):
+                game = Game.objects.create(tournament=self)
+                UserGame.objects.create(user=players[i].user, game=game)
+                UserGame.objects.create(user=players[j].user, game=game)
+
+        for i in range(len(players)):
+            game = Game.objects.create(tournament=self)
+            UserGame.objects.create(user=creator, game=game)
+            UserGame.objects.create(user=players[i].user, game=game)
+
+        self.save()
+    
+    def get_user_games(self):
+        from games.models import UserGame
+        user_games = UserGame.objects.filter(game__tournament=self)
+        return user_games
 
 # ********************************************************
 #       USER TOURNAMENT Model
