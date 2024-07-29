@@ -131,8 +131,8 @@ form {
   color: var(--slate-50);
 }
 .form-input:hover {
-  background-color: var(--slate-700);
-  border: 2px solid var(--active);
+  background-color: var(--slate-600);
+  /* border: 2px solid var(--active); */
 }
 .form-input:focus {
   outline: none;
