@@ -1,4 +1,4 @@
-import { mockFetch, userId } from "../mockFetch.js";
+import { getProfileById } from "../fetch.js";
 import TournamentsComponent from "../components/Tournaments.js";
 
 function initTournamentsComponent() {
@@ -13,7 +13,7 @@ function initTournamentsComponent() {
 // [TODO]: Use authenticatedFetch
 async function loadHomePage(userId) {
   try {
-    const profile = await mockFetch(`/api/profile/${userId}`);
+    const profile = await getProfileById(userId);
     console.log(`/api/profile/${userId}`);
     if (profile) {
       updateWelcomeMessage(profile);
@@ -32,7 +32,7 @@ function updateWelcomeMessage(profile) {
   const userNickname = document.getElementById("user-welcome-nickname");
   if (welcomeUsername && userNickname) {
     welcomeUsername.textContent = `Welcome back, ${profile.username}!`;
-    userNickname.textContent = `«${profile.alias}»`;
+    userNickname.textContent = `«${profile.display_name}»`;
   }
 }
 
@@ -42,8 +42,7 @@ function updateUserStats(profile) {
   const lossesElement = document.getElementById("user-losses");
 
   if (ratioElement && winsElement && lossesElement) {
-    const ratio = profile.wins / profile.losses || 0;
-
+    const ratio = profile.ratio;
     ratioElement.textContent = `${ratio.toFixed(2)}`;
     winsElement.textContent = `${profile.wins}`;
     lossesElement.textContent = `${profile.losses}`;
@@ -53,7 +52,7 @@ function updateUserStats(profile) {
 function updateUserAvatar(profile) {
   const avatarElement = document.getElementById("user-avatar");
   if (avatarElement) {
-    avatarElement.src = `/static/images/avatars/${profile.avatar}`;
+    avatarElement.src = profile.avatar;
     avatarElement.alt = `${profile.username}'s avatar`;
   }
 }

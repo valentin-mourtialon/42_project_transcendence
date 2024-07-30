@@ -129,7 +129,7 @@ async function refreshToken() {
 
     if (response.ok) {
       const data = await response.json();
-      localStorage.setItem("accessToken", data.access);
+      localStorage.setItem("access", data.access);
       return data.access;
     } else {
       throw new Error("Failed to refresh token");
@@ -144,7 +144,7 @@ async function refreshToken() {
 }
 
 // Making authenticated request with the Bearer token
-async function authenticatedFetch(url, options = {}) {
+export async function authenticatedFetch(url, options = {}) {
   let accessToken = localStorage.getItem("access");
 
   if (!accessToken) {

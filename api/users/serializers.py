@@ -5,75 +5,108 @@ from .models import FriendInvitation
 from .models import Blocked
 from transcendence.utils.constants import STATUS_ACCEPTED, STATUS_PENDING
 from django.core.exceptions import ValidationError
-
+from django.contrib.auth import get_user_model
 
 
 # ********************************************************
 #     PROFILE Serializer
 # ********************************************************
 
+User = get_user_model()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["username"]
+
+
 class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    games_played = serializers.IntegerField(read_only=True)
+    wins = serializers.IntegerField(read_only=True)
+    losses = serializers.IntegerField(read_only=True)
+    ratio = serializers.FloatField(read_only=True)
+
     class Meta:
         model = Profile
-        fields = '__all__'
-        extra_kwargs = {
-            'avatar': {'required': False, 'allow_null': True}
-        }
-    
-    def validate_wins(self, value):
-        if value < 0:
-            raise serializers.ValidationError("Wins number cannot be negative")
-        return value
-    
-    def validate_losses(self, value):
-        if value < 0:
-            raise serializers.ValidationError("Losses number cannot be negative")
+        fields = [
+            "user",
+            "avatar",
+            "display_name",
+            "games_played",
+            "wins",
+            "losses",
+            "ratio",
+        ]
+
+
+# class ProfileSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Profile
+#         fields = '__all__'
+#         extra_kwargs = {
+#             'avatar': {'required': False, 'allow_null': True}
+#         }
+
+#     def validate_wins(self, value):
+#         if value < 0:
+#             raise serializers.ValidationError("Wins number cannot be negative")
+#         return value
+
+#     def validate_losses(self, value):
+#         if value < 0:
+#             raise serializers.ValidationError("Losses number cannot be negative")
 
 # ********************************************************
 #     FRIEND / FRIEND INVITATIONS Serializers
 # ********************************************************
 
+
 class FriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['id', 'display_name', 'avatar']
+        fields = ["id", "display_name", "avatar"]
+
 
 class FriendshipSerializer(serializers.ModelSerializer):
     friend = serializers.SerializerMethodField()
+
     class Meta:
         model = FriendInvitation
-        fields = ['id', 'friend']
-    
+        fields = ["id", "friend"]
+
     def get_friend(self, instance):
-        user = self.context['request'].user.profile
+        user = self.context["request"].user.profile
         if instance.sender.id != user.id:
             friend_serializer = FriendSerializer(instance.sender)
             return friend_serializer.data
         friend_serializer = FriendSerializer(instance.receiver)
         return friend_serializer.data
- 
+
+
 class FriendInvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendInvitation
-        fields = ['id', 'sender', 'receiver', 'status']
-        read_only_fields = ['id', 'sender', 'status']
-    
+        fields = ["id", "sender", "receiver", "status"]
+        read_only_fields = ["id", "sender", "status"]
+
     # POST: to create an invitation
     def create(self, validated_data):
-        
+
         # Check if the invitation is correct
-        sender = self.context['request'].user.profile
-        receiver = validated_data['receiver']
-        validated_data['sender'] = sender
+        sender = self.context["request"].user.profile
+        receiver = validated_data["receiver"]
+        validated_data["sender"] = sender
         try:
             FriendInvitation.validate(sender, receiver)
         except ValidationError as e:
             raise serializers.ValidationError(e.message)
 
         # Create the invitation
-        validated_data['status'] = STATUS_PENDING
+        validated_data["status"] = STATUS_PENDING
         return super().create(validated_data)
-        
+
     # PATCH: to accept an invitation (update status to STATUS_ACCEPTED)
     def update(self, instance, validated_data):
         instance.status = STATUS_ACCEPTED
@@ -85,52 +118,46 @@ class FriendInvitationSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         receiver_serializer = FriendSerializer(instance.receiver)
-        representation['receiver'] = receiver_serializer.data
+        representation["receiver"] = receiver_serializer.data
         sender_serializer = FriendSerializer(instance.sender)
-        representation['sender'] = sender_serializer.data
+        representation["sender"] = sender_serializer.data
         return representation
+
 
 # ********************************************************
 #     BLOCKED Serializer
 # ********************************************************
 
+
 class BlockedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blocked
-        fields = ['id', 'blocker', 'blocked']
-        read_only_fields = ['id', 'blocker']
+        fields = ["id", "blocker", "blocked"]
+        read_only_fields = ["id", "blocker"]
 
     # POST: to block a friend
     def create(self, validated_data):
-        
+
         # Check if the user is actually friend with that person
         # And if it does exist, delete the invitation
-        blocker = self.context['request'].user.profile
-        blocked = validated_data['blocked']
-        validated_data['blocker'] = blocker
+        blocker = self.context["request"].user.profile
+        blocked = validated_data["blocked"]
+        validated_data["blocker"] = blocker
         try:
             FriendInvitation.are_friends(blocker, blocked)
             FriendInvitation.delete_invitation(blocker, blocked)
         except ValidationError as e:
             raise serializers.ValidationError(e.message)
-    
+
         # Create the blocked item
         return super().create(validated_data)
-    
 
     # GET: put all info
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         blocker_serializer = FriendSerializer(instance.blocker)
-        representation['blocker'] = blocker_serializer.data
+        representation["blocker"] = blocker_serializer.data
         blocked_serializer = FriendSerializer(instance.blocked)
-        representation['blocked'] = blocked_serializer.data
+        representation["blocked"] = blocked_serializer.data
         return representation
-
-
-
-
-
-
-    

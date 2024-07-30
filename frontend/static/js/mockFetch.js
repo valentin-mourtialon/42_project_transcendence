@@ -1,17 +1,9 @@
-import mockData from "./mocks/mockData.js";
-
-const userId = 1; // 3
-
-function getProfileById(userId) {
-  return mockData.profiles.find((profile) => profile.userId === userId);
-}
-
 function mockFetch(endpoint) {
   return new Promise((resolve) => {
     setTimeout(() => {
       switch (endpoint) {
-        case `/api/profile/${userId}`:
-          resolve(getProfileById(userId));
+        case `/api/users/profile/${userId}`:
+          resolve({});
           break;
 
         /**
@@ -27,7 +19,7 @@ function mockFetch(endpoint) {
          * Frontend: 1st tab "My tournaments"
          *
          */
-        case `/api/user/${userId}/created-tournaments`:
+        case `/api/users/${userId}/created-tournaments`:
           const creatorProfile = getProfileById(userId);
           const createdTournaments = mockData.tournaments
             .filter((tournament) => tournament.createdBy === userId)
@@ -60,7 +52,7 @@ function mockFetch(endpoint) {
          * Frontend: 2nd tab "Joined tournaments"
          *
          */
-        case `/api/user/${userId}/joined-tournaments`:
+        case `/api/users/${userId}/joined-tournaments`:
           const joinedTournaments = mockData.tournaments
             .filter(
               (tournament) =>
@@ -91,7 +83,7 @@ function mockFetch(endpoint) {
          * Frontend: 3rd tab "Pending invitations"
          *
          */
-        case `/api/user/${userId}/pending-invitations`:
+        case `/api/users/${userId}/pending-invitations`:
           const pendingInvitations = mockData.tournamentInvitations
             .filter(
               (invite) =>
@@ -119,4 +111,4 @@ function mockFetch(endpoint) {
   });
 }
 
-export { mockFetch, userId };
+export { mockFetch };

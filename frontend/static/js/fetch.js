@@ -1,24 +1,25 @@
-// export default async function apiRequest(url, method, data = null) {
-//   const options = {
-//     method: method,
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     credentials: "include", // Pour gérer les cookies de session
-//   };
+import { authenticatedFetch } from "./auth.js";
 
-//   const token = localStorage.getItem("access_token");
-//   if (token) {
-//     options.headers["Authorization"] = `Bearer ${token}`;
-//   }
+async function getProfileById(userId) {
+  try {
+    const response = await authenticatedFetch(`/api/users/profile/${userId}/`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch profile");
+    }
+    const data = await response.json();
+    return {
+      username: data.user.username,
+      avatar: data.avatar,
+      display_name: data.display_name,
+      games_played: data.games_played,
+      wins: data.wins,
+      losses: data.losses,
+      ratio: data.ratio,
+    };
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    throw error;
+  }
+}
 
-//   if (data) {
-//     options.body = JSON.stringify(data);
-//   }
-
-//   const response = await fetch(`/api${url}`, options);
-//   if (!response.ok) {
-//     throw new Error(`HTTP error! status: ${response.status}`);
-//   }
-//   return await response.json();
-// }
+export { getProfileById };

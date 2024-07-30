@@ -16,7 +16,7 @@ router.register(r"profile", ProfileViewSet, basename="profile")
 # router.register(r'blocked', BlockedViewSet, basename='blocked') # TO DO
 
 urlpatterns = [
-    path("/", include(router.urls)),
+    path("", include(router.urls)),
     path(
         "profile/friend-invitation/send",
         SendFriendInvitationAPIView.as_view(),
