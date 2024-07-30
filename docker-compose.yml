@@ -6,6 +6,7 @@ services:
     volumes:
       - ./frontend:/usr/share/nginx/html
       - static_volume:/app/staticfiles
+      - media_volume:/app/media
     depends_on:
       - api
     networks:
@@ -17,6 +18,7 @@ services:
     volumes:
       - ./api:/app
       - static_volume:/app/staticfiles
+      - media_volume:/app/media
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -55,3 +57,4 @@ networks:
 volumes:
   postgres_data:
   static_volume:
+  media_volume:

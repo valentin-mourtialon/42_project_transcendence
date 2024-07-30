@@ -1,9 +1,9 @@
-import tournamentsData from "./mocks/tournamentsData.js";
+import mockData from "./mocks/mockData.js";
 
 const userId = 1; // 3
 
 function getProfileById(userId) {
-  return tournamentsData.profiles.find((profile) => profile.userId === userId);
+  return mockData.profiles.find((profile) => profile.userId === userId);
 }
 
 function mockFetch(endpoint) {
@@ -29,10 +29,10 @@ function mockFetch(endpoint) {
          */
         case `/api/user/${userId}/created-tournaments`:
           const creatorProfile = getProfileById(userId);
-          const createdTournaments = tournamentsData.tournaments
+          const createdTournaments = mockData.tournaments
             .filter((tournament) => tournament.createdBy === userId)
             .map((tournament) => {
-              const invitations = tournamentsData.tournamentInvitations.filter(
+              const invitations = mockData.tournamentInvitations.filter(
                 (invite) => invite.tournamentId === tournament.id
               );
               return {
@@ -61,7 +61,7 @@ function mockFetch(endpoint) {
          *
          */
         case `/api/user/${userId}/joined-tournaments`:
-          const joinedTournaments = tournamentsData.tournaments
+          const joinedTournaments = mockData.tournaments
             .filter(
               (tournament) =>
                 tournament.participants.includes(userId) &&
@@ -92,13 +92,13 @@ function mockFetch(endpoint) {
          *
          */
         case `/api/user/${userId}/pending-invitations`:
-          const pendingInvitations = tournamentsData.tournamentInvitations
+          const pendingInvitations = mockData.tournamentInvitations
             .filter(
               (invite) =>
                 invite.invitedUserId === userId && invite.status === "Pending"
             )
             .map((invite) => {
-              const tournament = tournamentsData.tournaments.find(
+              const tournament = mockData.tournaments.find(
                 (t) => t.id === invite.tournamentId
               );
               return {

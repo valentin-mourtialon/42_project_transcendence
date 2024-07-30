@@ -33,16 +33,16 @@
   ],
 
   "Profiles": [
-    { "user": 3, "avatar": "avatar2.png", "display_name": "Master Of Pong" },
-    { "user": 3, "avatar": "avatar3.png", "display_name": "Wizard Of Paddles" },
-    { "user": 4, "avatar": "avatar4.png", "display_name": "Chase The Ball" },
-    { "user": 5, "avatar": "avatar5.png", "display_name": "King Of Spin" },
+    { "user": 2, "avatar": "avatar1.png", "display_name": "Master Of Pong" },
+    { "user": 3, "avatar": "avatar2.png", "display_name": "Wizard Of Paddles" },
+    { "user": 4, "avatar": "avatar3.png", "display_name": "Chase The Ball" },
+    { "user": 5, "avatar": "avatar4.png", "display_name": "King Of Spin" },
     {
       "user": 6,
-      "avatar": "avatar6.png",
+      "avatar": "avatar5.png",
       "display_name": "Titan Of The Table"
     },
-    { "user": 7, "avatar": "avatar7.png", "display_name": "Queen Of Rallies" }
+    { "user": 7, "avatar": "avatar6.png", "display_name": "Queen Of Rallies" }
   ],
 
   "FriendInvitations": [

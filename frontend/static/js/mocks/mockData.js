@@ -219,4 +219,4 @@ const mockData = {
   ],
 };
 
-export default tournamentsData;
+export default mockData;

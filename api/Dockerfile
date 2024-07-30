@@ -8,6 +8,13 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
+COPY mock_data.json .
+
+# Create the folder for the avatars pictures (see volumes)
+RUN mkdir -p /app/media/avatars
+
+COPY ./media/avatars/*.png /app/media/avatars/
+
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
