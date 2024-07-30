@@ -1,4 +1,5 @@
 import { mockFetch } from "../mockFetch.js";
+import { getCreatedTournaments } from "../fetch.js";
 
 export default class TournamentsComponent {
   constructor(userId) {
@@ -35,9 +36,7 @@ export default class TournamentsComponent {
     let tournaments = [];
     switch (this.currentTab) {
       case "my-tournaments":
-        tournaments = await mockFetch(
-          `/api/user/${this.userId}/created-tournaments`
-        );
+        tournaments = await getCreatedTournaments(this.userId);
         break;
       case "accepted-tournaments":
         tournaments = await mockFetch(

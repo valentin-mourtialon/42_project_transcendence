@@ -1,7 +1,7 @@
 import { getProfileById } from "../fetch.js";
 import TournamentsComponent from "../components/Tournaments.js";
 
-function initTournamentsComponent() {
+function initTournamentsComponent(userId) {
   const tournamentsContainer = document.querySelector(".tournaments-container");
   if (tournamentsContainer) {
     new TournamentsComponent(userId);

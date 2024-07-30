@@ -8,7 +8,7 @@ function mockFetch(endpoint) {
 
         /**
          *
-         * 1. "My tournaments" (those the user created)
+         * 1. /** "My tournaments" (those the user created)
          *
          * SELECT *
          * FROM Tournaments as t

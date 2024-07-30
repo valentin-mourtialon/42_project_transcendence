@@ -12,5 +12,5 @@ urlpatterns = [
     # to do: based on what we want, we might reinclude 1st and 2nd path inside model view set
     path("create/", CreateTournamentAPIView.as_view(), name="create-tournament"),
     path("<int:pk>/start/", StartTournamentAPIView.as_view(), name="start-tournament"),
-    path("/", include(router.urls)),
+    path("", include(router.urls)),
 ]

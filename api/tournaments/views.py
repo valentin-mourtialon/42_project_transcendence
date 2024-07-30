@@ -1,59 +1,117 @@
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, permissions, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from django.shortcuts import get_object_or_404
+
+from users.models import Profile
 from games.serializers import UserGameSerializer
-from .models import Tournament
-from .serializers import CreateTournamentSerializer, StartTournamentSerializer, TournamentSerializer
-from .models import UserTournamentInvitation
-from .serializers import UserTournamentInvitationSerializer
+from .permissions import IsOwnerOrReadOnly
+from .models import Tournament, UserTournamentInvitation
+from .serializers import (
+    TournamentSerializer,
+    UserTournamentInvitationSerializer,
+    CreateTournamentSerializer,
+    StartTournamentSerializer,
+)
 
-# ********************************************************
-#       TOURNAMENT ModelViewSet
-# ********************************************************
 
-# TO DO: will turn into APIVIew if no more actions than GET is needed
 class TournamentViewSet(viewsets.ModelViewSet):
-    queryset = Tournament.objects.all()
     serializer_class = TournamentSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
-    # GET all tournament invitations
-    @action(detail=True, methods=['get'], url_path='tournament-invitations')
+    def get_queryset(self):
+        queryset = Tournament.objects.all()
+        created_by_user_id = self.request.query_params.get("created_by")
+        if created_by_user_id:
+            profile = get_object_or_404(Profile, user_id=created_by_user_id)
+            queryset = queryset.filter(created_by=profile)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user.profile)
+
+    @action(detail=True, methods=["get"], url_path="tournament-invitations")
     def tournament_invitations(self, request, pk=None):
-        invitations = Tournament.get_tournament_invitations(pk)
+        tournament = self.get_object()
+        invitations = tournament.get_tournament_invitations()
         serializer = UserTournamentInvitationSerializer(invitations, many=True)
         return Response(serializer.data)
-    
-    # GET user games
-    @action(detail=True, methods=['get'], url_path='user-games')
+
+    @action(detail=True, methods=["get"], url_path="user-games")
     def user_games(self, request, pk=None):
-        games = Tournament.get_user_games(pk)
+        tournament = self.get_object()
+        games = tournament.get_user_games()
         serializer = UserGameSerializer(games, many=True)
         return Response(serializer.data)
-    
-# ********************************************************
-#       CREATE TOURNAMENT APIView
-# ********************************************************
+
 
 class CreateTournamentAPIView(generics.CreateAPIView):
     serializer_class = CreateTournamentSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-# ********************************************************
-#       START TOURNAMENT APIView
-# ********************************************************
 
 class StartTournamentAPIView(generics.UpdateAPIView):
     queryset = Tournament.objects.all()
     serializer_class = StartTournamentSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {"request": self.request}
 
-# ********************************************************
-#       USER TOURNAMENT ModelViewSet
-#       (oce: prob not gonna be useful)
-# ********************************************************
 
 class UserTournamentInvitationViewSet(viewsets.ModelViewSet):
     queryset = UserTournamentInvitation.objects.all()
     serializer_class = UserTournamentInvitationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+# # ********************************************************
+# #       TOURNAMENT ModelViewSet
+# # ********************************************************
+
+# # TO DO: will turn into APIVIew if no more actions than GET is needed
+# class TournamentViewSet(viewsets.ModelViewSet):
+#     queryset = Tournament.objects.all()
+#     serializer_class = TournamentSerializer
+
+#     # GET all tournament invitations
+#     @action(detail=True, methods=['get'], url_path='tournament-invitations')
+#     def tournament_invitations(self, request, pk=None):
+#         invitations = Tournament.get_tournament_invitations(pk)
+#         serializer = UserTournamentInvitationSerializer(invitations, many=True)
+#         return Response(serializer.data)
+
+#     # GET user games
+#     @action(detail=True, methods=['get'], url_path='user-games')
+#     def user_games(self, request, pk=None):
+#         games = Tournament.get_user_games(pk)
+#         serializer = UserGameSerializer(games, many=True)
+#         return Response(serializer.data)
+
+# # ********************************************************
+# #       CREATE TOURNAMENT APIView
+# # ********************************************************
+
+# class CreateTournamentAPIView(generics.CreateAPIView):
+#     serializer_class = CreateTournamentSerializer
+
+# # ********************************************************
+# #       START TOURNAMENT APIView
+# # ********************************************************
+
+# class StartTournamentAPIView(generics.UpdateAPIView):
+#     queryset = Tournament.objects.all()
+#     serializer_class = StartTournamentSerializer
+
+#     def get_serializer_context(self):
+#         return {'request': self.request}
+
+# # ********************************************************
+# #       USER TOURNAMENT ModelViewSet
+# #       (oce: prob not gonna be useful)
+# # ********************************************************
+
+# class UserTournamentInvitationViewSet(viewsets.ModelViewSet):
+#     queryset = UserTournamentInvitation.objects.all()
+#     serializer_class = UserTournamentInvitationSerializer

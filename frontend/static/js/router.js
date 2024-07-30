@@ -87,7 +87,7 @@ const router = async () => {
   if (match.route.path === "/user/:id") {
     const userId = match.params.id;
     await loadHomePage(userId);
-    initTournamentsComponent();
+    initTournamentsComponent(userId);
   } else if (match.route.path === "/login") {
     setupLoginForm();
   } else if (match.route.path === "/register") {

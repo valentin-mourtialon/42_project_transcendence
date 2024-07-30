@@ -33,104 +33,124 @@
   ],
 
   "Profiles": [
-    { "user": 2, "avatar": "avatar1.png", "display_name": "Master Of Pong" },
-    { "user": 3, "avatar": "avatar2.png", "display_name": "Wizard Of Paddles" },
-    { "user": 4, "avatar": "avatar3.png", "display_name": "Chase The Ball" },
-    { "user": 5, "avatar": "avatar4.png", "display_name": "King Of Spin" },
+    {
+      "user": 2,
+      "avatar": "avatar1.png",
+      "display_name": "Master Of Pong"
+    },
+    {
+      "user": 3,
+      "avatar": "avatar2.png",
+      "display_name": "Wizard Of Paddles"
+    },
+    {
+      "user": 4,
+      "avatar": "avatar3.png",
+      "display_name": "Chase The Ball"
+    },
+    {
+      "user": 5,
+      "avatar": "avatar4.png",
+      "display_name": "King Of Spin"
+    },
     {
       "user": 6,
       "avatar": "avatar5.png",
       "display_name": "Titan Of The Table"
     },
-    { "user": 7, "avatar": "avatar6.png", "display_name": "Queen Of Rallies" }
+    {
+      "user": 7,
+      "avatar": "avatar6.png",
+      "display_name": "Queen Of Rallies"
+    }
   ],
 
   "FriendInvitations": [
-    { "sender": 2, "receiver": 3, "status": "Accepted" },
-    { "sender": 2, "receiver": 4, "status": "Accepted" },
-    { "sender": 2, "receiver": 5, "status": "Pending" },
-    { "sender": 2, "receiver": 6, "status": "Pending" },
-    { "sender": 2, "receiver": 7, "status": "Declined" },
-    { "sender": 3, "receiver": 4, "status": "Accepted" },
-    { "sender": 3, "receiver": 5, "status": "Accepted" },
-    { "sender": 3, "receiver": 6, "status": "Accepted" },
-    { "sender": 3, "receiver": 7, "status": "Accepted" },
-    { "sender": 4, "receiver": 5, "status": "Accepted" },
-    { "sender": 4, "receiver": 6, "status": "Accepted" },
-    { "sender": 4, "receiver": 7, "status": "Accepted" },
-    { "sender": 5, "receiver": 6, "status": "Accepted" },
-    { "sender": 5, "receiver": 7, "status": "Accepted" },
-    { "sender": 6, "receiver": 7, "status": "Declined" }
+    { "sender": 2, "receiver": 3, "status": "ACCEPTED" },
+    { "sender": 2, "receiver": 4, "status": "ACCEPTED" },
+    { "sender": 2, "receiver": 5, "status": "PENDING" },
+    { "sender": 2, "receiver": 6, "status": "PENDING" },
+    { "sender": 2, "receiver": 7, "status": "DECLINED" },
+    { "sender": 3, "receiver": 4, "status": "ACCEPTED" },
+    { "sender": 3, "receiver": 5, "status": "ACCEPTED" },
+    { "sender": 3, "receiver": 6, "status": "ACCEPTED" },
+    { "sender": 3, "receiver": 7, "status": "ACCEPTED" },
+    { "sender": 4, "receiver": 5, "status": "ACCEPTED" },
+    { "sender": 4, "receiver": 6, "status": "ACCEPTED" },
+    { "sender": 4, "receiver": 7, "status": "ACCEPTED" },
+    { "sender": 5, "receiver": 6, "status": "ACCEPTED" },
+    { "sender": 5, "receiver": 7, "status": "ACCEPTED" },
+    { "sender": 6, "receiver": 7, "status": "DECLINED" }
   ],
 
   "Tournaments": [
     {
       "name": "Summer Slam",
-      "type": "Remote",
+      "type": "REMOTE",
       "created_by": 2,
-      "status": "Completed"
+      "status": "COMPLETED"
     },
     {
       "name": "Festoche",
-      "type": "Remote",
+      "type": "REMOTE",
       "created_by": 3,
-      "status": "Completed"
+      "status": "COMPLETED"
     },
     {
       "name": "Paddle Party",
-      "type": "Remote",
+      "type": "REMOTE",
       "created_by": 4,
-      "status": "In Progress"
+      "status": "IN_PROGRESS"
     },
     {
       "name": "Spin Masters",
-      "type": "Remote",
+      "type": "REMOTE",
       "created_by": 5,
-      "status": "Preparation"
+      "status": "IN_PREPARATION"
     },
     {
       "name": "El grande Natchos",
-      "type": "Remote",
+      "type": "REMOTE",
       "created_by": 2,
-      "status": "Preparation"
+      "status": "IN_PREPARATION"
     },
     {
       "name": "Royal Pong",
-      "type": "Remote",
+      "type": "REMOTE",
       "created_by": 6,
-      "status": "In Progress"
+      "status": "IN_PROGRESS"
     },
     {
       "name": "Table Tennis Extravaganza",
-      "type": "Remote",
+      "type": "REMOTE",
       "created_by": 7,
-      "status": "In Progress"
+      "status": "IN_PROGRESS"
     }
   ],
 
   "UserTournamentInvitations": [
-    { "tournament": 1, "user": 3, "status": "Accepted" },
-    { "tournament": 1, "user": 4, "status": "Accepted" },
-    { "tournament": 1, "user": 5, "status": "Accepted" },
-    { "tournament": 2, "user": 2, "status": "Accepted" },
-    { "tournament": 2, "user": 4, "status": "Accepted" },
-    { "tournament": 2, "user": 5, "status": "Accepted" },
-    { "tournament": 3, "user": 2, "status": "Accepted" },
-    { "tournament": 3, "user": 3, "status": "Accepted" },
-    { "tournament": 4, "user": 2, "status": "Pending" },
-    { "tournament": 4, "user": 3, "status": "Accepted" },
-    { "tournament": 4, "user": 4, "status": "Pending" },
-    { "tournament": 5, "user": 3, "status": "Pending" },
-    { "tournament": 5, "user": 4, "status": "Accepted" },
-    { "tournament": 5, "user": 5, "status": "Declined" },
-    { "tournament": 5, "user": 6, "status": "Accepted" },
-    { "tournament": 6, "user": 2, "status": "Pending" },
-    { "tournament": 6, "user": 3, "status": "Accepted" },
-    { "tournament": 6, "user": 4, "status": "Declined" },
-    { "tournament": 6, "user": 5, "status": "Accepted" },
-    { "tournament": 7, "user": 3, "status": "Accepted" },
-    { "tournament": 7, "user": 4, "status": "Declined" },
-    { "tournament": 7, "user": 5, "status": "Accepted" }
+    { "tournament": 1, "user": 3, "status": "ACCEPTED" },
+    { "tournament": 1, "user": 4, "status": "ACCEPTED" },
+    { "tournament": 1, "user": 5, "status": "ACCEPTED" },
+    { "tournament": 2, "user": 2, "status": "ACCEPTED" },
+    { "tournament": 2, "user": 4, "status": "ACCEPTED" },
+    { "tournament": 2, "user": 5, "status": "ACCEPTED" },
+    { "tournament": 3, "user": 2, "status": "ACCEPTED" },
+    { "tournament": 3, "user": 3, "status": "ACCEPTED" },
+    { "tournament": 4, "user": 2, "status": "PENDING" },
+    { "tournament": 4, "user": 3, "status": "ACCEPTED" },
+    { "tournament": 4, "user": 4, "status": "PENDING" },
+    { "tournament": 5, "user": 3, "status": "PENDING" },
+    { "tournament": 5, "user": 4, "status": "ACCEPTED" },
+    { "tournament": 5, "user": 5, "status": "DECLINED" },
+    { "tournament": 5, "user": 6, "status": "ACCEPTED" },
+    { "tournament": 6, "user": 2, "status": "PENDING" },
+    { "tournament": 6, "user": 3, "status": "ACCEPTED" },
+    { "tournament": 6, "user": 4, "status": "DECLINED" },
+    { "tournament": 6, "user": 5, "status": "ACCEPTED" },
+    { "tournament": 7, "user": 3, "status": "ACCEPTED" },
+    { "tournament": 7, "user": 4, "status": "DECLINED" },
+    { "tournament": 7, "user": 5, "status": "ACCEPTED" }
   ],
 
   "UserGames": [
