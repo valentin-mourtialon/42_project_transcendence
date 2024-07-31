@@ -152,10 +152,10 @@
               alt="User avatar"
             />
             <div class="welcome-user-banner__infos">
-              <h1
+              <h2
                 id="user-welcome-message"
                 class="welcome-user-banner__infos__welcome"
-              ></h1>
+              ></h2>
               <div class="welcome-user-banner__infos__profile">
                 <p
                   id="user-welcome-nickname"
@@ -207,21 +207,37 @@
               <!-- TOURNAMENTS DYNAMICALLY ADDED HERE -->
             </div>
           </div>
-          <!-- <div class="friends-container">
-            <h2>Friends</h2>
-            <nav class="user-home-nav">
-              <a href="/tournaments" class="nav-button" data-link>
-              <span class="nav-text">Tournaments and games</span>
-              <span class="nav-arrow">→</span>
-            </a>
-              <a href="/friends" class="nav-button" data-link>
-                <span class="nav-text">Friends</span>
-                <span class="nav-arrow">→</span>
-              </a>
-            </nav>
-          </div> -->
+
+          <div class="friends-container">
+            <div class="friends-header">
+              <h2>Friends</h2>
+              <button id="add-friend" class="btn-add-friends">
+                + Add a friend
+              </button>
+            </div>
+
+            <div class="friends-tabs">
+              <button class="friends-tab tab-btn active" data-tab="my-friends">
+                My Friends
+              </button>
+              <button
+                class="friends-tab tab-btn"
+                data-tab="pending-friend-invitations"
+              >
+                Pending invitations
+              </button>
+              <button class="friends-tab tab-btn" data-tab="blocked-friends">
+                Blocked
+              </button>
+            </div>
+
+            <div class="friends-list" id="friends-list">
+              <!-- FRIENDS DYNAMICALLY ADDED HERE -->
+            </div>
+          </div>
         </div>
       </div>
+      <div class="bottom-spacer"></div>
     </template>
 
     <template id="template-tournament">
@@ -237,6 +253,21 @@
         <div class="tournament-actions">
           <button class="tournament-action"></button>
         </div>
+      </div>
+    </template>
+
+    <template id="template-friends">
+      <div class="friend-item">
+        <div class="friend-infos">
+          <img
+            id="friend-avatar"
+            class="friend-avatar"
+            src=""
+            alt="Friend's' avatar"
+          />
+          <h3 class="friend-name"></h3>
+        </div>
+        <div class="friend-actions"></div>
       </div>
     </template>
 

@@ -78,14 +78,12 @@ class FriendshipSerializer(serializers.ModelSerializer):
 
     def get_friend(self, instance):
         user = self.context["request"].user.profile
-        if instance.sender.id != user.id:
-            friend_serializer = FriendSerializer(instance.sender)
-            return friend_serializer.data
-        friend_serializer = FriendSerializer(instance.receiver)
-        return friend_serializer.data
+        friend = instance.receiver if instance.sender == user else instance.sender
+        return FriendSerializer(friend).data
 
 
 class FriendInvitationSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = FriendInvitation
         fields = ["id", "sender", "receiver", "status"]

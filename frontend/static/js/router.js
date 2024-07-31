@@ -1,6 +1,7 @@
 import {
   loadHomePage,
   initTournamentsComponent,
+  initFriendsComponent,
 } from "./views/userHomeView.js";
 import { setupLoginForm, setupRegisterForm } from "./auth.js";
 
@@ -88,6 +89,7 @@ const router = async () => {
     const userId = match.params.id;
     await loadHomePage(userId);
     initTournamentsComponent(userId);
+    initFriendsComponent(userId);
   } else if (match.route.path === "/login") {
     setupLoginForm();
   } else if (match.route.path === "/register") {

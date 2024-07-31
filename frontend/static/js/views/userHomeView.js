@@ -1,5 +1,6 @@
 import { getProfileById } from "../fetch.js";
 import TournamentsComponent from "../components/Tournaments.js";
+import FriendsComponent from "../components/Friends.js";
 
 function initTournamentsComponent(userId) {
   const tournamentsContainer = document.querySelector(".tournaments-container");
@@ -7,6 +8,15 @@ function initTournamentsComponent(userId) {
     new TournamentsComponent(userId);
   } else {
     console.error("Tournaments container not found in the DOM");
+  }
+}
+
+function initFriendsComponent(userId) {
+  const friendsContainer = document.querySelector(".friends-container");
+  if (friendsContainer) {
+    new FriendsComponent(userId);
+  } else {
+    console.error("Friends container not found in the DOM");
   }
 }
 
@@ -57,4 +67,4 @@ function updateUserAvatar(profile) {
   }
 }
 
-export { loadHomePage, initTournamentsComponent };
+export { loadHomePage, initTournamentsComponent, initFriendsComponent };

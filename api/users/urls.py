@@ -15,6 +15,7 @@ router = DefaultRouter()
 router.register(r"profile", ProfileViewSet, basename="profile")
 # router.register(r'blocked', BlockedViewSet, basename='blocked') # TO DO
 
+
 urlpatterns = [
     path("", include(router.urls)),
     path(

@@ -85,7 +85,9 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=["get"], url_path="friends")
     def friends(self, request):
         user = request.user
-        accepted_invitations = user.profile.get_accepted_invitations()
+        accepted_invitations = user.profile.get_accepted_invitations().select_related(
+            "sender", "receiver"
+        )
         serializer = FriendshipSerializer(
             accepted_invitations, many=True, context={"request": request}
         )
@@ -149,6 +151,24 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
         user = request.user
         games = user.profile.get_game_history()
         serializer = UserGameSerializer(games, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["get"], url_path="pending-friend-invitations")
+    def pending_friend_invitations(self, request):
+        user = request.user
+        received_invitations = user.profile.get_received_friend_invitations()
+        serializer = FriendInvitationSerializer(
+            received_invitations, many=True, context={"request": request}
+        )
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["get"], url_path="blocked-users")
+    def blocked_users(self, request):
+        user = request.user
+        blocked_users = Blocked.objects.filter(blocker=user.profile)
+        serializer = BlockedSerializer(
+            blocked_users, many=True, context={"request": request}
+        )
         return Response(serializer.data)
 
 

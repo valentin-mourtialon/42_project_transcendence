@@ -57,11 +57,10 @@ class Profile(models.Model):
     def get_accepted_invitations(self):
         from .models import FriendInvitation
 
-        accepted_invitations = FriendInvitation.objects.filter(
-            models.Q(sender=self, status=STATUS_ACCEPTED)
-            | models.Q(receiver=self, status=STATUS_ACCEPTED)
+        return FriendInvitation.objects.filter(
+            (models.Q(sender=self) | models.Q(receiver=self))
+            & models.Q(status=STATUS_ACCEPTED)
         )
-        return accepted_invitations
 
     def get_sent_friend_invitations(self):
         from .models import FriendInvitation

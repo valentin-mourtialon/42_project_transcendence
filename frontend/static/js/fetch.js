@@ -1,5 +1,11 @@
 import { authenticatedFetch } from "./auth.js";
 
+/******************************************************************************/
+/*                                                                            */
+/*                                  Profile                                   */
+/*                                                                            */
+/******************************************************************************/
+
 async function getProfileById(userId) {
   try {
     const response = await authenticatedFetch(`/api/users/profile/${userId}/`);
@@ -21,6 +27,12 @@ async function getProfileById(userId) {
     throw error;
   }
 }
+
+/******************************************************************************/
+/*                                                                            */
+/*                              Tournaments                                   */
+/*                                                                            */
+/******************************************************************************/
 
 async function getCreatedTournaments(userId) {
   try {
@@ -86,9 +98,83 @@ async function getPendingInvitations(userId) {
   }
 }
 
+/******************************************************************************/
+/*                                                                            */
+/*                                Friends                                     */
+/*                                                                            */
+/******************************************************************************/
+
+async function getFriendsList() {
+  try {
+    const response = await authenticatedFetch("/api/users/profile/friends/");
+    if (!response.ok) {
+      throw new Error("Failed to fetch friends list");
+    }
+    const data = await response.json();
+    return data.map((friendship) => ({
+      id: friendship.friend.id,
+      display_name: friendship.friend.display_name,
+      avatar: friendship.friend.avatar,
+    }));
+  } catch (error) {
+    console.error("Error fetching friends list:", error);
+    throw error;
+  }
+}
+
+async function getPendingFriendsInvitations() {
+  try {
+    const response = await authenticatedFetch(
+      "/api/users/profile/pending-friend-invitations/"
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch pending friend invitations");
+    }
+    const data = await response.json();
+    return data.map((invitation) => ({
+      id: invitation.id,
+      sender: {
+        id: invitation.sender.id,
+        display_name: invitation.sender.display_name,
+        avatar: invitation.sender.avatar,
+      },
+      status: invitation.status,
+    }));
+  } catch (error) {
+    console.error("Error fetching pending friend invitations:", error);
+    throw error;
+  }
+}
+
+async function getBlockedList() {
+  try {
+    const response = await authenticatedFetch(
+      "/api/users/profile/blocked-users/"
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch blocked users list");
+    }
+    const data = await response.json();
+    return data.map((blockedItem) => ({
+      id: blockedItem.id,
+      blockedUser: {
+        id: blockedItem.blocked.id,
+        display_name: blockedItem.blocked.display_name,
+        avatar: blockedItem.blocked.avatar,
+      },
+    }));
+  } catch (error) {
+    console.error("Error fetching blocked users list:", error);
+    throw error;
+  }
+}
+
 export {
   getProfileById,
   getCreatedTournaments,
   getJoinedTournaments,
   getPendingInvitations,
+  getFriendsList,
+  getPendingFriendsInvitations,
+  getBlockedList,
 };
