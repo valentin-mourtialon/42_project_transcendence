@@ -23,9 +23,15 @@ class TournamentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Tournament.objects.all()
         created_by_user_id = self.request.query_params.get("created_by")
+        participant_user_id = self.request.query_params.get("participant")
         if created_by_user_id:
             profile = get_object_or_404(Profile, user_id=created_by_user_id)
             queryset = queryset.filter(created_by=profile)
+        elif participant_user_id:
+            profile = get_object_or_404(Profile, user_id=participant_user_id)
+            queryset = queryset.filter(
+                tournament_users__user=profile, tournament_users__status="ACCEPTED"
+            ).exclude(created_by=profile)
         return queryset
 
     def perform_create(self, serializer):
@@ -46,6 +52,24 @@ class TournamentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+class TournamentInvitationViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = UserTournamentInvitationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = UserTournamentInvitation.objects.all()
+        invited_user_id = self.request.query_params.get("invited_user")
+        status = self.request.query_params.get("status")
+
+        if invited_user_id:
+            profile = get_object_or_404(Profile, user_id=invited_user_id)
+            queryset = queryset.filter(user=profile)
+        if status:
+            queryset = queryset.filter(status=status.upper())
+
+        return queryset
+
+
 class CreateTournamentAPIView(generics.CreateAPIView):
     serializer_class = CreateTournamentSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -58,12 +82,6 @@ class StartTournamentAPIView(generics.UpdateAPIView):
 
     def get_serializer_context(self):
         return {"request": self.request}
-
-
-class UserTournamentInvitationViewSet(viewsets.ModelViewSet):
-    queryset = UserTournamentInvitation.objects.all()
-    serializer_class = UserTournamentInvitationSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
 
 # # ********************************************************

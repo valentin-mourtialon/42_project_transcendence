@@ -26,7 +26,7 @@ urlpatterns = [
     path("api/users/", include("users.urls")),
     path("api/auth/", include("authentication.urls")),
     path("api/games/", include("games.urls")),
-    path("api/tournaments/", include("tournaments.urls")),
+    path("api/", include("tournaments.urls")),
 ]
 
 # DEBUG: Get the media files requested with MEDIA URL in MEDIA_ROOT

@@ -43,6 +43,14 @@ class TournamentSerializer(serializers.ModelSerializer):
         return [invite.user.id for invite in declined_invitations]
 
 
+class UserTournamentInvitationSerializer(serializers.ModelSerializer):
+    tournament = TournamentSerializer()
+
+    class Meta:
+        model = UserTournamentInvitation
+        fields = ["id", "user", "tournament", "status"]
+
+
 # ********************************************************
 #       CREATE TOURNAMENT Serializer
 # ********************************************************
@@ -96,16 +104,16 @@ class StartTournamentSerializer(serializers.ModelSerializer):
 # ********************************************************
 #       USER TOURNAMENT Serializer
 # ********************************************************
-class UserTournamentInvitationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserTournamentInvitation
-        fields = "__all__"
+# class UserTournamentInvitationSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = UserTournamentInvitation
+#         fields = "__all__"
 
-    # GET: add tournament and user info inside the user tournament invitation JSON response
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        tournament_serializer = TournamentSerializer(instance.tournament)
-        representation["tournament"] = tournament_serializer.data
-        user_serializer = FriendSerializer(instance.user)
-        representation["user"] = user_serializer.data
-        return representation
+#     # GET: add tournament and user info inside the user tournament invitation JSON response
+#     def to_representation(self, instance):
+#         representation = super().to_representation(instance)
+#         tournament_serializer = TournamentSerializer(instance.tournament)
+#         representation["tournament"] = tournament_serializer.data
+#         user_serializer = FriendSerializer(instance.user)
+#         representation["user"] = user_serializer.data
+#         return representation

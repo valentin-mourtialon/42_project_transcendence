@@ -135,7 +135,7 @@ const mockData = {
     { tournament: 5, user: 4, status: "Declined" },
     { tournament: 5, user: 5, status: "Accepted" },
     // Tournament 6 In progress | 3 players = 3 games
-    { tournament: 6, user: 1, status: "Pending" }, // [TODO]: What we do if a user starts a tournament when it still remains pending requests
+    { tournament: 6, user: 1, status: "Pending" }, // [TODO]: What we do if a user starts a tournament when it still remains pending requests ??
     { tournament: 6, user: 2, status: "Accepted" },
     { tournament: 6, user: 3, status: "Declined" },
     { tournament: 6, user: 4, status: "Accepted" },

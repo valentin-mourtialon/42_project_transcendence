@@ -1,5 +1,8 @@
-import { mockFetch } from "../mockFetch.js";
-import { getCreatedTournaments } from "../fetch.js";
+import {
+  getCreatedTournaments,
+  getJoinedTournaments,
+  getPendingInvitations,
+} from "../fetch.js";
 
 export default class TournamentsComponent {
   constructor(userId) {
@@ -39,14 +42,10 @@ export default class TournamentsComponent {
         tournaments = await getCreatedTournaments(this.userId);
         break;
       case "accepted-tournaments":
-        tournaments = await mockFetch(
-          `/api/user/${this.userId}/joined-tournaments`
-        );
+        tournaments = await getJoinedTournaments(this.userId);
         break;
       case "pending-invitations":
-        tournaments = await mockFetch(
-          `/api/user/${this.userId}/pending-invitations`
-        );
+        tournaments = await getPendingInvitations(this.userId);
         break;
     }
     this.renderTournaments(tournaments);
