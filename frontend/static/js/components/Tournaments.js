@@ -63,9 +63,8 @@ export default class TournamentsComponent {
         tournament.name;
 
       // Tournament status
-      tournamentElement.querySelector(
-        ".tournament-status"
-      ).textContent = `${tournament.status}`;
+      tournamentElement.querySelector(".tournament-status").textContent =
+        this.getTournamentStatus(tournament.status);
 
       // Add the tournament creator
       const createdByElement = tournamentElement.querySelector(
@@ -154,6 +153,11 @@ export default class TournamentsComponent {
     } else {
       return tournament.participants.length;
     }
+  }
+
+  getTournamentStatus(status) {
+    const formattedStatus = status.toLowerCase().replace("_", " ");
+    return formattedStatus.charAt(0).toUpperCase() + formattedStatus.slice(1);
   }
 
   canStartTournament(tournament) {

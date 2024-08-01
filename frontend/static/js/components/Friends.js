@@ -84,13 +84,11 @@ export default class FriendsComponent {
       friendActions.innerHTML = "";
       if (this.currentTab === "my-friends") {
         // View profile button
-        const viewProfileButton = document.createElement("button");
-        viewProfileButton.textContent = "View profile";
-        viewProfileButton.classList.add("friend-action", "view-profile");
-        viewProfileButton.addEventListener("click", () =>
-          this.viewProfile(friend)
-        );
-        friendActions.appendChild(viewProfileButton);
+        const start1V1Button = document.createElement("button");
+        start1V1Button.textContent = "Start 1V1";
+        start1V1Button.classList.add("friend-action", "start-1v1");
+        start1V1Button.addEventListener("click", () => this.start1V1(friend));
+        friendActions.appendChild(start1V1Button);
 
         // Block button
         const blockButton = document.createElement("button");
@@ -133,27 +131,32 @@ export default class FriendsComponent {
 
   viewProfile(friend) {
     // [TODO]: Implement logic to view friend's profile
-    console.log("Viewing profile of", friend.displayName);
+    console.log("Viewing profile of", friend.display_name);
+  }
+
+  start1V1(friend) {
+    // [TODO]: Implement logic to start 1V1
+    console.log("Starting 1V1 with", friend.display_name);
   }
 
   blockFriend(friend) {
     // [TODO]: Implement logic to block friend
-    console.log("Blocking", friend.displayName);
+    console.log("Blocking", friend.display_name);
   }
 
   acceptInvitation(friend) {
     // [TODO]: Implement logic to accept friend invitation
-    console.log("Accepting invitation from", friend.sender.displayName);
+    console.log("Accepting invitation from", friend.sender.display_name);
   }
 
   declineInvitation(friend) {
     // [TODO]: Implement logic to decline friend invitation
-    console.log("Declining invitation from", friend.sender.displayName);
+    console.log("Declining invitation from", friend.sender.display_name);
   }
 
   unblockFriend(friend) {
     // [TODO]: Implement logic to unblock friend
-    console.log("Unblocking", friend.blockedUser.displayName);
+    console.log("Unblocking", friend.blockedUser.display_name);
   }
 
   addFriend() {
