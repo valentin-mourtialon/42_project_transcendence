@@ -3,6 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
+from django.db.models import Q
+
 from games.models import UserGame
 from games.serializers import UserGameSerializer
 from tournaments.serializers import (
@@ -81,15 +83,45 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
             raise PermissionDenied()
         return super().destroy(request, *args, **kwargs)
 
+    # [VMOURTIA] : Fix: filter blocked users
     # GET all friends
     @action(detail=False, methods=["get"], url_path="friends")
     def friends(self, request):
         user = request.user
-        accepted_invitations = user.profile.get_accepted_invitations().select_related(
+        user_profile = user.profile
+
+        accepted_invitations = user_profile.get_accepted_invitations().select_related(
             "sender", "receiver"
         )
+
+        # Get all users blocked by the current user and all users who blocked the current user
+        blocked_users = Blocked.objects.filter(
+            Q(blocker=user_profile) | Q(blocked=user_profile)
+        ).values_list("blocker_id", "blocked_id")
+
+        blocked_user_ids = set()
+        for blocker_id, blocked_id in blocked_users:
+            if blocker_id == user_profile.id:
+                blocked_user_ids.add(blocked_id)
+            else:
+                blocked_user_ids.add(blocker_id)
+
+        # Filter out blocked friends
+        filtered_invitations = [
+            inv
+            for inv in accepted_invitations
+            if (
+                inv.sender.id != user_profile.id
+                and inv.sender.id not in blocked_user_ids
+            )
+            or (
+                inv.receiver.id != user_profile.id
+                and inv.receiver.id not in blocked_user_ids
+            )
+        ]
+
         serializer = FriendshipSerializer(
-            accepted_invitations, many=True, context={"request": request}
+            filtered_invitations, many=True, context={"request": request}
         )
         return Response(serializer.data)
 

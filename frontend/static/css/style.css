@@ -76,6 +76,15 @@ body {
   color: var(--slate-50);
 }
 
+.data-link {
+  color: var(--active);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.data-link:hover {
+  color: var(--slate-400);
+}
 .link-button {
   background: none;
   border: none;
@@ -316,8 +325,8 @@ form {
 
 .btn-add-friends {
   border: 1px solid var(--active);
-  border-radius: 0.5rem;
-  padding: 0.5rem;
+  border-radius: 0.375rem;
+  padding: 0.375rem;
   font-weight: 600;
   color: var(--slate-1000);
   background-color: var(--active);
@@ -370,7 +379,7 @@ form {
 }
 
 .friend-avatar {
-  width: 72px;
+  width: 60px;
   object-fit: contain;
   border-radius: 50%;
 }
@@ -447,8 +456,8 @@ form {
 
 .btn-create-tournament {
   border: 1px solid var(--active);
-  border-radius: 0.5rem;
-  padding: 0.5rem;
+  border-radius: 0.375rem;
+  padding: 0.375rem;
   font-weight: 600;
   color: var(--slate-1000);
   background-color: var(--active);
@@ -643,7 +652,6 @@ form {
 .modal-header {
   position: sticky;
   top: 0;
-  background-color: var(--slate-800);
   z-index: 2;
   display: flex;
   align-items: center;
@@ -679,7 +687,7 @@ form {
   left: 0;
   right: 0;
   height: 1px;
-  background-color: var(--slate-600);
+  background-color: var(--slate-700);
 }
 
 .game-list li:last-child {

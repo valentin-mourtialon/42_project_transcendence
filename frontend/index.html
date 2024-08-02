@@ -8,13 +8,6 @@
     <title>ft_transcendance</title>
   </head>
   <body>
-    <!-- <nav class="nav">
-      <a href="/" class="nav__link" data-link>Index</a>
-      <a href="/login" class="nav__link" data-link>Login</a>
-      <a href="/register" class="nav__link" data-link>SignUp</a>
-      <a href="/user" class="nav__link" data-link>User</a>
-    </nav> -->
-
     <div id="app"></div>
 
     <template id="template-index"></template>
@@ -48,7 +41,8 @@
             </div>
           </form>
           <div class="not-registered-yet">
-            Not registered yet? <a href="/register" data-link>Register here</a>
+            Not registered yet?
+            <a href="/register" data-link class="data-link">Register here</a>
           </div>
         </div>
       </div>
@@ -135,7 +129,8 @@
             <button class="form-button" type="submit">Sign up</button>
           </form>
           <div class="already-have-account">
-            Already have an account? <a href="/login" data-link>Log in now</a>
+            Already have an account?
+            <a href="/login" data-link class="data-link">Log in now</a>
           </div>
         </div>
       </div>
@@ -188,7 +183,7 @@
           <div class="tournaments-container">
             <div class="tournaments-header">
               <div class="tournaments-header-right">
-                <h2>Tournaments and Games</h2>
+                <h2>Tournaments</h2>
                 <button id="see-all-games" class="link-button">
                   See all games
                 </button>
