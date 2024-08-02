@@ -20,6 +20,9 @@ class TournamentViewSet(viewsets.ModelViewSet):
     serializer_class = TournamentSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
+    # [VMOURTIA] :
+    #   - /api/tournaments/?created_by=${userId}
+    #   - /api/tournaments/?participant=${userId}
     def get_queryset(self):
         queryset = Tournament.objects.all()
         created_by_user_id = self.request.query_params.get("created_by")
@@ -37,6 +40,8 @@ class TournamentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user.profile)
 
+    # [VMOURTIA] :
+    #   - /api/tournament-invitations/?invited_user=${userId}&status=pending
     @action(detail=True, methods=["get"], url_path="tournament-invitations")
     def tournament_invitations(self, request, pk=None):
         tournament = self.get_object()

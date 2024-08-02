@@ -100,6 +100,27 @@ async function getPendingInvitations(userId) {
 
 /******************************************************************************/
 /*                                                                            */
+/*                              Game history                                  */
+/*                                                                            */
+/******************************************************************************/
+
+async function getGameHistory() {
+  try {
+    const response = await authenticatedFetch(
+      "/api/users/profile/game-history"
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch game history");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching game history:", error);
+    throw error;
+  }
+}
+
+/******************************************************************************/
+/*                                                                            */
 /*                                Friends                                     */
 /*                                                                            */
 /******************************************************************************/
@@ -173,6 +194,7 @@ export {
   getProfileById,
   getCreatedTournaments,
   getJoinedTournaments,
+  getGameHistory,
   getPendingInvitations,
   getFriendsList,
   getPendingFriendsInvitations,

@@ -2,6 +2,7 @@ import {
   getCreatedTournaments,
   getJoinedTournaments,
   getPendingInvitations,
+  getGameHistory,
 } from "../fetch.js";
 
 export default class TournamentsComponent {
@@ -13,6 +14,10 @@ export default class TournamentsComponent {
     this.createButton = document.getElementById("create-tournament");
     this.currentTab = "my-tournaments";
 
+    this.seeAllGamesBtn = document.getElementById("see-all-games");
+    this.modal = null;
+    this.closeBtn = null;
+
     this.initEventListeners();
     this.loadTournaments();
   }
@@ -23,8 +28,8 @@ export default class TournamentsComponent {
         this.switchTab(button.dataset.tab)
       );
     });
-
     this.createButton.addEventListener("click", () => this.createTournament());
+    this.seeAllGamesBtn.addEventListener("click", () => this.showGameHistory());
   }
 
   switchTab(tabName) {
@@ -199,5 +204,77 @@ export default class TournamentsComponent {
 
   createTournament() {
     console.log("Creating a new tournament");
+  }
+
+  async showGameHistory() {
+    try {
+      const games = await getGameHistory();
+      this.openGameHistoryModal(games);
+    } catch (error) {
+      console.error("Error showing game history:", error);
+      // [TODO] : Add a user feedback
+    }
+  }
+
+  openGameHistoryModal(games) {
+    const template = document.getElementById("template-game-history-modal");
+    this.modal = template.content
+      .cloneNode(true)
+      .querySelector("#game-history-modal");
+
+    const gameList = this.modal.querySelector("#game-list");
+    games.forEach((game) => {
+      const li = document.createElement("li");
+      const date = new Date(
+        game.game.tournament.created_by
+      ).toLocaleDateString();
+      const tournamentName = game.game.tournament.name;
+      const opponentName = game.opponent.display_name;
+      const userScore = game.score;
+      const opponentScore = game.opponent.score;
+      const result = game.is_winner ? "Won" : "Lost";
+      const tournamentStatus = game.game.tournament.status;
+
+      li.innerHTML = `
+        <div class="game-item">
+          <div class="game-info">
+            <span class="game-date">${date}</span>
+            <span class="tournament-name">« ${tournamentName} »</span>
+            <span class="tournament-status">${this.getTournamentStatus(
+              tournamentStatus
+            )}</span>
+          </div>
+          <div class="game-result">
+          <span class="result ${result.toLowerCase()}">Result: ${result} |</span>
+            <span class="opponent-name">You (${userScore}) VS « ${opponentName} » (${opponentScore})</span>
+          </div>
+        </div>
+      `;
+      gameList.appendChild(li);
+    });
+
+    document.body.appendChild(this.modal);
+    this.modal.style.display = "block";
+    document.body.classList.add("no-scroll");
+    document.getElementById("app").classList.add("blur-background");
+
+    this.closeBtn = this.modal.querySelector(".close");
+    this.closeBtn.addEventListener("click", () => this.closeModal());
+
+    window.addEventListener("click", (event) => {
+      if (event.target == this.modal) {
+        this.closeModal();
+      }
+    });
+  }
+
+  closeModal() {
+    if (this.modal) {
+      this.modal.style.display = "none";
+      document.body.removeChild(this.modal);
+      document.body.classList.remove("no-scroll");
+      document.getElementById("app").classList.remove("blur-background");
+      this.modal = null;
+    }
   }
 }

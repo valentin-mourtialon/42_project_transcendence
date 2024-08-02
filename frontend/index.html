@@ -161,7 +161,9 @@
                   id="user-welcome-nickname"
                   class="welcome-user-banner__infos__nick"
                 ></p>
-                <a href="/profile" data-link>Update profile</a>
+                <button id="update-profile" class="link-button">
+                  Update profile
+                </button>
               </div>
             </div>
           </div>
@@ -185,7 +187,12 @@
           </div>
           <div class="tournaments-container">
             <div class="tournaments-header">
-              <h2>Tournaments and Games</h2>
+              <div class="tournaments-header-right">
+                <h2>Tournaments and Games</h2>
+                <button id="see-all-games" class="link-button">
+                  See all games
+                </button>
+              </div>
               <button id="create-tournament" class="btn-create-tournament">
                 + Create tournament
               </button>
@@ -252,6 +259,20 @@
         </div>
         <div class="tournament-actions">
           <button class="tournament-action"></button>
+        </div>
+      </div>
+    </template>
+
+    <template id="template-game-history-modal">
+      <div id="game-history-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Game History</h2>
+            <span class="close">&times;</span>
+          </div>
+          <ul id="game-list" class="game-list">
+            <!-- GAMES WILL BE DYNAMICALLY ADDED HERE -->
+          </ul>
         </div>
       </div>
     </template>

@@ -113,6 +113,7 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
         )
         return Response(serializer.data)
 
+    # [VMOURTIA] : Unused
     # GET all created tournaments
     @action(detail=False, methods=["get"], url_path="created-tournaments")
     def created_tournaments(self, request):
@@ -121,6 +122,7 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = TournamentSerializer(created_tournaments, many=True)
         return Response(serializer.data)
 
+    # [VMOURTIA] : Unused
     # GET all received tournament invitations
     @action(detail=False, methods=["get"], url_path="received-tournament-invitations")
     def received_tournament_invitations(self, request):
@@ -133,6 +135,7 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
         )
         return Response(serializer.data)
 
+    # [VMOURTIA] : Unused
     # GET all accepted tournament invitations
     @action(detail=False, methods=["get"], url_path="accepted-tournament-invitations")
     def accepted_tournament_invitations(self, request):
@@ -145,6 +148,7 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
         )
         return Response(serializer.data)
 
+    # [VMOURTIA] : Done
     # GET game history with opponent
     @action(detail=False, methods=["get"], url_path="game-history")
     def game_history(self, request):
@@ -153,6 +157,7 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = UserGameSerializer(games, many=True)
         return Response(serializer.data)
 
+    # [VMOURTIA] : Done
     @action(detail=False, methods=["get"], url_path="pending-friend-invitations")
     def pending_friend_invitations(self, request):
         user = request.user
@@ -162,6 +167,7 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
         )
         return Response(serializer.data)
 
+    # [VMOURTIA] : Done
     @action(detail=False, methods=["get"], url_path="blocked-users")
     def blocked_users(self, request):
         user = request.user
