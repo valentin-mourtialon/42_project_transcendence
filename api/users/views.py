@@ -25,24 +25,32 @@ from .serializers import BlockedSerializer
 # ********************************************************
 
 
-class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
+class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    @action(detail=False, methods=["get"], url_path=r"(?P<user_id>\d+)")
-    def get_profile(self, request, user_id=None):
-        try:
-            profile = Profile.objects.get(user__id=user_id)
-            if profile.user != request.user:
-                return Response(
-                    {"detail": "You don't have permission to view this profile."},
-                    status=403,
-                )
-            serializer = self.get_serializer(profile)
-            return Response(serializer.data)
-        except Profile.DoesNotExist:
-            return Response({"detail": "Not found."}, status=404)
+    # @action(detail=False, methods=["get"], url_path=r"(?P<user_id>\d+)")
+    # def get_profile(self, request, user_id=None):
+    #     try:
+    #         profile = Profile.objects.get(user__id=user_id)
+    #         if profile.user != request.user:
+    #             return Response(
+    #                 {"detail": "You don't have permission to view this profile."},
+    #                 status=403,
+    #             )
+    #         serializer = self.get_serializer(profile)
+    #         return Response(serializer.data)
+    #     except Profile.DoesNotExist:
+    #         return Response({"detail": "Not found."}, status=404)
+
+    # GET: get user profile
+    def retrieve(self, request, *args, **kwargs):
+        profile = self.get_object()
+        user = request.user
+        if user != profile.user and profile not in user.profile.get_friends():
+            raise PermissionDenied()
+        return super().retrieve(request, *args, **kwargs)
 
     # GET list of profiles (remove the profile the user has blocked, the user themselves)
     def list(self, request, *args, **kwargs):

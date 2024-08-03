@@ -22,7 +22,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    # user = UserSerializer(read_only=True)
+    username = serializers.SerializerMethodField()
     games_played = serializers.IntegerField(read_only=True)
     wins = serializers.IntegerField(read_only=True)
     losses = serializers.IntegerField(read_only=True)
@@ -31,7 +32,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = [
-            "user",
+            # "user",
+            "username",
             "avatar",
             "display_name",
             "games_played",
@@ -39,35 +41,25 @@ class ProfileSerializer(serializers.ModelSerializer):
             "losses",
             "ratio",
         ]
+    #     read_only_fields = ['username']
+    
+    def get_username(self, instance):
+        return instance.user.username
 
-
-# class ProfileSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Profile
-#         fields = '__all__'
-#         extra_kwargs = {
-#             'avatar': {'required': False, 'allow_null': True}
-#         }
-
-#     def validate_wins(self, value):
-#         if value < 0:
-#             raise serializers.ValidationError("Wins number cannot be negative")
-#         return value
-
-#     def validate_losses(self, value):
-#         if value < 0:
-#             raise serializers.ValidationError("Losses number cannot be negative")
 
 # ********************************************************
 #     FRIEND / FRIEND INVITATIONS Serializers
 # ********************************************************
 
-
 class FriendSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+
     class Meta:
         model = Profile
-        fields = ["id", "display_name", "avatar"]
-
+        fields = ["id", "username", "display_name", "avatar"]
+    
+    def get_username(self, instance):
+        return instance.user.username
 
 class FriendshipSerializer(serializers.ModelSerializer):
     friend = serializers.SerializerMethodField()
@@ -80,7 +72,6 @@ class FriendshipSerializer(serializers.ModelSerializer):
         user = self.context["request"].user.profile
         friend = instance.receiver if instance.sender == user else instance.sender
         return FriendSerializer(friend).data
-
 
 class FriendInvitationSerializer(serializers.ModelSerializer):
 
