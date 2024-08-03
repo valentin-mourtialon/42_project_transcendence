@@ -44,5 +44,5 @@ urlpatterns = [
         UnblockFriendAPIView.as_view(),
         name="unblock",
     ),
-    path("profile/blocked/", BlockedListAPIView.as_view(), name="blocked-list"),
+    path("profile/blocked/list/", BlockedListAPIView.as_view(), name="blocked-list"),
 ]

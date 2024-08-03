@@ -43,6 +43,11 @@ class ProfileViewSet(viewsets.ModelViewSet):
     #         return Response(serializer.data)
     #     except Profile.DoesNotExist:
     #         return Response({"detail": "Not found."}, status=404)
+    
+    @action(detail=False, methods=["get"], url_path="get-profile")
+    def get_profile(self, request):
+        serializer = ProfileSerializer(request.user.profile)
+        return Response(serializer.data)
 
     # GET: get user profile
     def retrieve(self, request, *args, **kwargs):
@@ -93,14 +98,14 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     # [VMOURTIA] : Fix: filter blocked users
     # GET all friends
-    @action(detail=False, methods=["get"], url_path="friends")
-    def friends(self, request):
-        user = request.user
-        user_profile = user.profile
+    # @action(detail=False, methods=["get"], url_path="friends")
+    # def friends(self, request):
+    #     user = request.user
+    #     user_profile = user.profile
 
-        accepted_invitations = user_profile.get_accepted_invitations().select_related(
-            "sender", "receiver"
-        )
+    #     accepted_invitations = user_profile.get_accepted_invitations().select_related(
+    #         "sender", "receiver"
+    #     )
 
         # # Get all users blocked by the current user and all users who blocked the current user
         # blocked_users = Blocked.objects.filter(
