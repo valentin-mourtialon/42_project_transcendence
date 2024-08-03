@@ -1,6 +1,7 @@
 services:
   nginx:
     build: ./nginx
+    container_name: nginx
     ports:
       - "80:80"
     volumes:
@@ -19,6 +20,8 @@ services:
       - ./api:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
+    container_name: api
+    restart: on-failure
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -34,6 +37,7 @@ services:
 
   db:
     image: postgres:13
+    container_name: db
     restart: on-failure
     volumes:
       - postgres_data:/var/lib/postgresql/data

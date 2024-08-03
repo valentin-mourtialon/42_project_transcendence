@@ -3,9 +3,9 @@ from .models import Tournament
 from .models import UserTournamentInvitation
 
 class TournamentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'type', 'created_by', 'winner', 'status')
+    list_display = ('id', 'name', 'type', 'created_by', 'winner', 'status', 'is_1v1')
     search_fields = ('name', 'type', 'created_by__username')
-    list_filter = ['type']
+    list_filter = ['type', 'is_1v1']
 
 class UserTournamentInvitationAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'tournament', 'status')

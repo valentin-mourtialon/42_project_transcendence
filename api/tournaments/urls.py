@@ -4,18 +4,18 @@ from .views import (
     CreateTournamentAPIView,
     StartTournamentAPIView,
     TournamentViewSet,
-    TournamentInvitationViewSet,
+    # TournamentInvitationViewSet,
 )
 
 # from .views import UserTournamentViewSet
 
 router = DefaultRouter()
 router.register(r"tournaments", TournamentViewSet, basename="tournament")
-router.register(
-    r"tournament-invitations",
-    TournamentInvitationViewSet,
-    basename="tournament-invitation",
-)
+# router.register(
+#     r"tournament-invitations",
+#     TournamentInvitationViewSet,
+#     basename="tournament-invitation",
+# )
 # router.register(r'', UserTournamentViewSet, basename='user_tournament')
 
 urlpatterns = [

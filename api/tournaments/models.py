@@ -37,6 +37,7 @@ class Tournament(models.Model):
     status = models.CharField(
         max_length=50, choices=TOURNAMENT_STATUS_CHOICES, default=STATUS_IN_PREPARATION
     )
+    is_1v1 = models.BooleanField(default=False)
 
     def get_tournament_invitations(self):
         tournament_invitations = UserTournamentInvitation.objects.select_related(
