@@ -102,35 +102,43 @@ class ProfileViewSet(viewsets.ModelViewSet):
             "sender", "receiver"
         )
 
-        # Get all users blocked by the current user and all users who blocked the current user
-        blocked_users = Blocked.objects.filter(
-            Q(blocker=user_profile) | Q(blocked=user_profile)
-        ).values_list("blocker_id", "blocked_id")
+        # # Get all users blocked by the current user and all users who blocked the current user
+        # blocked_users = Blocked.objects.filter(
+        #     Q(blocker=user_profile) | Q(blocked=user_profile)
+        # ).values_list("blocker_id", "blocked_id")
 
-        blocked_user_ids = set()
-        for blocker_id, blocked_id in blocked_users:
-            if blocker_id == user_profile.id:
-                blocked_user_ids.add(blocked_id)
-            else:
-                blocked_user_ids.add(blocker_id)
+        # blocked_user_ids = set()
+        # for blocker_id, blocked_id in blocked_users:
+        #     if blocker_id == user_profile.id:
+        #         blocked_user_ids.add(blocked_id)
+        #     else:
+        #         blocked_user_ids.add(blocker_id)
 
-        # Filter out blocked friends
-        filtered_invitations = [
-            inv
-            for inv in accepted_invitations
-            if (
-                inv.sender.id != user_profile.id
-                and inv.sender.id not in blocked_user_ids
-            )
-            or (
-                inv.receiver.id != user_profile.id
-                and inv.receiver.id not in blocked_user_ids
-            )
-        ]
+        # # Filter out blocked friends
+        # filtered_invitations = [
+        #     inv
+        #     for inv in accepted_invitations
+        #     if (
+        #         inv.sender.id != user_profile.id
+        #         and inv.sender.id not in blocked_user_ids
+        #     )
+        #     or (
+        #         inv.receiver.id != user_profile.id
+        #         and inv.receiver.id not in blocked_user_ids
+        #     )
+        # ]
 
-        serializer = FriendshipSerializer(
-            filtered_invitations, many=True, context={"request": request}
-        )
+        # serializer = FriendshipSerializer(
+        #     filtered_invitations, many=True, context={"request": request}
+        # )
+        # return Response(serializer.data)
+    
+    # GET all friends
+    @action(detail=False, methods=['get'], url_path='friends')
+    def friends(self, request):
+        user = request.user
+        accepted_invitations = user.profile.get_accepted_invitations()
+        serializer = FriendshipSerializer(accepted_invitations, many=True, context={'request': request})
         return Response(serializer.data)
 
     # GET all the invitations the user has sent
