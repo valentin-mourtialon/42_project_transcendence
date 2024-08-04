@@ -195,6 +195,39 @@ async function getBlockedList() {
   }
 }
 
+async function acceptFriendInvitation(invitationId) {
+  try {
+    const response = await authenticatedFetch(
+      `/api/users/profile/friend-invitation/${invitationId}/accept/`,
+      { method: "PATCH" }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to accept friend invitation");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error accepting friend invitation:", error);
+    throw error;
+  }
+}
+
+async function declineFriendInvitation(invitationId) {
+  try {
+    const response = await authenticatedFetch(
+      `/api/users/profile/friend-invitation/${invitationId}/decline/`,
+      { method: "DELETE" }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to decline friend invitation");
+    }
+    // return await response.json();
+    return;
+  } catch (error) {
+    console.error("Error declining friend invitation:", error);
+    throw error;
+  }
+}
+
 export {
   getUserProfile,
   getCreatedTournaments,
@@ -204,4 +237,6 @@ export {
   getFriendsList,
   getPendingFriendsInvitations,
   getBlockedList,
+  acceptFriendInvitation,
+  declineFriendInvitation,
 };

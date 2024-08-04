@@ -2,6 +2,8 @@ import {
   getFriendsList,
   getPendingFriendsInvitations,
   getBlockedList,
+  acceptFriendInvitation,
+  declineFriendInvitation,
 } from "../fetch.js";
 
 export default class FriendsComponent {
@@ -143,16 +145,6 @@ export default class FriendsComponent {
     console.log("Blocking", friend.display_name);
   }
 
-  acceptInvitation(friend) {
-    // [TODO]: Implement logic to accept friend invitation
-    console.log("Accepting invitation from", friend.sender.display_name);
-  }
-
-  declineInvitation(friend) {
-    // [TODO]: Implement logic to decline friend invitation
-    console.log("Declining invitation from", friend.sender.display_name);
-  }
-
   unblockFriend(friend) {
     // [TODO]: Implement logic to unblock friend
     console.log("Unblocking", friend.blockedUser.display_name);
@@ -161,5 +153,27 @@ export default class FriendsComponent {
   addFriend() {
     // [TODO]: Implement logic to add a friend
     console.log("Creating a new friend");
+  }
+
+  async acceptInvitation(friend) {
+    try {
+      await acceptFriendInvitation(friend.id);
+      console.log("Accepted invitation from", friend.sender.display_name);
+      this.loadFriends();
+    } catch (error) {
+      console.error("Error accepting friend invitation:", error);
+      // [TODO]: Giving user feedback
+    }
+  }
+
+  async declineInvitation(friend) {
+    try {
+      await declineFriendInvitation(friend.id);
+      console.log("Declined invitation from", friend.sender.display_name);
+      this.loadFriends();
+    } catch (error) {
+      console.error("Error declining friend invitation:", error);
+      // [TODO]: Giving user feedback
+    }
   }
 }
