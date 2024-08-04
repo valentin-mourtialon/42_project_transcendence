@@ -6,8 +6,7 @@ import {
 } from "../fetch.js";
 
 export default class TournamentsComponent {
-  constructor(userId) {
-    this.userId = userId;
+  constructor() {
     this.container = document.querySelector(".tournaments-container");
     this.tabButtons = this.container.querySelectorAll(".tab-btn");
     this.tournamentsList = document.getElementById("tournaments-list");
@@ -44,13 +43,13 @@ export default class TournamentsComponent {
     let tournaments = [];
     switch (this.currentTab) {
       case "my-tournaments":
-        tournaments = await getCreatedTournaments(this.userId);
+        tournaments = await getCreatedTournaments();
         break;
       case "accepted-tournaments":
-        tournaments = await getJoinedTournaments(this.userId);
+        tournaments = await getJoinedTournaments();
         break;
       case "pending-invitations":
-        tournaments = await getPendingInvitations(this.userId);
+        tournaments = await getPendingInvitations();
         break;
     }
     this.renderTournaments(tournaments);

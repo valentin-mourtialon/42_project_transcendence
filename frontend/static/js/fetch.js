@@ -6,15 +6,17 @@ import { authenticatedFetch } from "./auth.js";
 /*                                                                            */
 /******************************************************************************/
 
-async function getProfileById(userId) {
+async function getUserProfile() {
   try {
-    const response = await authenticatedFetch(`/api/users/profile/${userId}/`);
+    const response = await authenticatedFetch(
+      `/api/users/profile/get-profile/`
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch profile");
     }
     const data = await response.json();
     return {
-      username: data.user.username,
+      username: data.username,
       avatar: data.avatar,
       display_name: data.display_name,
       games_played: data.games_played,
@@ -34,10 +36,10 @@ async function getProfileById(userId) {
 /*                                                                            */
 /******************************************************************************/
 
-async function getCreatedTournaments(userId) {
+async function getCreatedTournaments() {
   try {
     const response = await authenticatedFetch(
-      `/api/tournaments/?created_by=${userId}`
+      `/api/users/profile/created-tournaments/`
     );
     if (!response.ok) {
       throw new Error("Failed to fetch created tournaments");
@@ -45,8 +47,8 @@ async function getCreatedTournaments(userId) {
     const data = await response.json();
     return data.map((tournament) => ({
       ...tournament,
-      creatorProfile: tournament.creator_profile,
-      participantCount: tournament.participant_count,
+      creatorProfile: { id: tournament.created_by },
+      participantCount: 0, // [VMOURTIA] This information is not provided in the new API
       tournamentType: "created",
     }));
   } catch (error) {
@@ -55,19 +57,19 @@ async function getCreatedTournaments(userId) {
   }
 }
 
-async function getJoinedTournaments(userId) {
+async function getJoinedTournaments() {
   try {
     const response = await authenticatedFetch(
-      `/api/tournaments/?participant=${userId}`
+      `/api/users/profile/accepted-tournament-invitations/`
     );
     if (!response.ok) {
       throw new Error("Failed to fetch joined tournaments");
     }
     const data = await response.json();
-    return data.map((tournament) => ({
-      ...tournament,
-      creatorProfile: tournament.creator_profile,
-      participantCount: tournament.participant_count,
+    return data.map((invitation) => ({
+      ...invitation.tournament,
+      creatorProfile: { id: invitation.tournament.created_by },
+      participantCount: 0, // [VMOURTIA] This information is not provided in the new API
       tournamentType: "joined",
     }));
   } catch (error) {
@@ -76,10 +78,10 @@ async function getJoinedTournaments(userId) {
   }
 }
 
-async function getPendingInvitations(userId) {
+async function getPendingInvitations() {
   try {
     const response = await authenticatedFetch(
-      `/api/tournament-invitations/?invited_user=${userId}&status=pending`
+      `/api/users/profile/received-tournament-invitations/`
     );
     if (!response.ok) {
       throw new Error("Failed to fetch pending invitations");
@@ -87,9 +89,9 @@ async function getPendingInvitations(userId) {
     const data = await response.json();
     return data.map((invitation) => ({
       ...invitation.tournament,
-      invitationStatus: "Pending",
-      creatorProfile: invitation.tournament.creator_profile,
-      participantCount: invitation.tournament.participant_count,
+      invitationStatus: invitation.status,
+      creatorProfile: { id: invitation.tournament.created_by },
+      participantCount: 0, // [VMOURTIA] This information is not provided in the new API
       tournamentType: "pending",
     }));
   } catch (error) {
@@ -107,7 +109,7 @@ async function getPendingInvitations(userId) {
 async function getGameHistory() {
   try {
     const response = await authenticatedFetch(
-      "/api/users/profile/game-history"
+      "/api/users/profile/game-history/"
     );
     if (!response.ok) {
       throw new Error("Failed to fetch game history");
@@ -136,6 +138,7 @@ async function getFriendsList() {
       id: friendship.friend.id,
       display_name: friendship.friend.display_name,
       avatar: friendship.friend.avatar,
+      username: friendship.friend.username,
     }));
   } catch (error) {
     console.error("Error fetching friends list:", error);
@@ -146,7 +149,7 @@ async function getFriendsList() {
 async function getPendingFriendsInvitations() {
   try {
     const response = await authenticatedFetch(
-      "/api/users/profile/pending-friend-invitations/"
+      "/api/users/profile/received-friend-invitations/"
     );
     if (!response.ok) {
       throw new Error("Failed to fetch pending friend invitations");
@@ -158,6 +161,7 @@ async function getPendingFriendsInvitations() {
         id: invitation.sender.id,
         display_name: invitation.sender.display_name,
         avatar: invitation.sender.avatar,
+        username: invitation.sender.username,
       },
       status: invitation.status,
     }));
@@ -170,7 +174,7 @@ async function getPendingFriendsInvitations() {
 async function getBlockedList() {
   try {
     const response = await authenticatedFetch(
-      "/api/users/profile/blocked-users/"
+      "/api/users/profile/blocked/list/"
     );
     if (!response.ok) {
       throw new Error("Failed to fetch blocked users list");
@@ -182,6 +186,7 @@ async function getBlockedList() {
         id: blockedItem.blocked.id,
         display_name: blockedItem.blocked.display_name,
         avatar: blockedItem.blocked.avatar,
+        username: blockedItem.blocked.username,
       },
     }));
   } catch (error) {
@@ -191,7 +196,7 @@ async function getBlockedList() {
 }
 
 export {
-  getProfileById,
+  getUserProfile,
   getCreatedTournaments,
   getJoinedTournaments,
   getGameHistory,

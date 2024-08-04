@@ -1,30 +1,29 @@
-import { getProfileById } from "../fetch.js";
+import { getUserProfile } from "../fetch.js";
 import TournamentsComponent from "../components/Tournaments.js";
 import FriendsComponent from "../components/Friends.js";
 
-function initTournamentsComponent(userId) {
+function initTournamentsComponent() {
   const tournamentsContainer = document.querySelector(".tournaments-container");
   if (tournamentsContainer) {
-    new TournamentsComponent(userId);
+    new TournamentsComponent();
   } else {
     console.error("Tournaments container not found in the DOM");
   }
 }
 
-function initFriendsComponent(userId) {
+function initFriendsComponent() {
   const friendsContainer = document.querySelector(".friends-container");
   if (friendsContainer) {
-    new FriendsComponent(userId);
+    new FriendsComponent();
   } else {
     console.error("Friends container not found in the DOM");
   }
 }
 
 // [TODO]: Use authenticatedFetch
-async function loadHomePage(userId) {
+async function loadHomePage() {
   try {
-    const profile = await getProfileById(userId);
-    console.log(`/api/profile/${userId}`);
+    const profile = await getUserProfile();
     if (profile) {
       updateWelcomeMessage(profile);
       updateUserStats(profile);

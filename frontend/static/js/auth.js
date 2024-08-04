@@ -1,4 +1,10 @@
 import { navigateTo, navigateToUserPage } from "./router.js";
+import {
+  setTokens,
+  getAccessToken,
+  getRefreshToken,
+  clearTokens,
+} from "./sessionManager.js";
 
 // [TODO] ADD FRONTEND FORM VALIDATION
 function setupLoginForm() {
@@ -8,44 +14,15 @@ function setupLoginForm() {
       e.preventDefault();
       const username = document.getElementById("login-username").value;
       const password = document.getElementById("login-password").value;
-
       const loginResult = await loginUser(username, password);
-
       if (loginResult.success) {
         console.log("User logged in successfully.");
-        navigateToUserPage(loginResult.userId);
+        navigateToUserPage();
       } else {
         console.error("Login failed");
         navigateTo("/login");
       }
     });
-  }
-}
-
-async function loginUser(username, password) {
-  try {
-    const response = await fetch("/api/auth/login/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
-      localStorage.setItem("userId", data.user_id);
-      return { success: true, userId: data.user_id };
-    } else {
-      console.error("Login failed");
-      // [TODO] GIVE USER ERRORS FEEDBACKS
-      return { success: false };
-    }
-  } catch (error) {
-    console.error("Error during login:", error);
-    // [TODO] GIVE USER ERRORS FEEDBACKS
-    return { success: false };
   }
 }
 
@@ -96,7 +73,7 @@ function setupRegisterForm() {
 
           if (loginResult.success) {
             console.log("User logged in successfully after registration");
-            navigateToUserPage(loginResult.userId);
+            navigateToUserPage();
           } else {
             console.error("Automatic login failed after registration");
             navigateTo("/login");
@@ -112,14 +89,37 @@ function setupRegisterForm() {
   }
 }
 
+async function loginUser(username, password) {
+  try {
+    const response = await fetch("/api/auth/login/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      setTokens(data.access, data.refresh);
+      return { success: true };
+    } else {
+      console.error("Login failed");
+      return { success: false };
+    }
+  } catch (error) {
+    console.error("Error during login:", error);
+    return { success: false };
+  }
+}
+
 async function refreshToken() {
-  const refreshToken = localStorage.getItem("refresh");
+  const refreshToken = getRefreshToken();
   if (!refreshToken) {
-    throw new Error("No refresh token available");
+    return false;
   }
 
   try {
-    const response = await fetch("/api/auth/token/refresh", {
+    const response = await fetch("/api/auth/token/refresh/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -129,24 +129,21 @@ async function refreshToken() {
 
     if (response.ok) {
       const data = await response.json();
-      localStorage.setItem("access", data.access);
-      return data.access;
+      setTokens(data.access, refreshToken); // We keep the same access token
+      return true;
     } else {
-      throw new Error("Failed to refresh token");
+      clearTokens();
+      return false;
     }
   } catch (error) {
-    // If refresh process fails, log the user out.
     console.error("Error refreshing token:", error);
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
-    navigateTo("/login");
+    clearTokens();
+    return false;
   }
 }
 
-// Making authenticated request with the Bearer token
-export async function authenticatedFetch(url, options = {}) {
-  let accessToken = localStorage.getItem("access");
-
+async function authenticatedFetch(url, options = {}) {
+  let accessToken = getAccessToken();
   if (!accessToken) {
     throw new Error("No access token available");
   }
@@ -160,10 +157,15 @@ export async function authenticatedFetch(url, options = {}) {
     let response = await fetch(url, options);
 
     if (response.status === 401) {
-      // If token has expired, it tries to refresh it
-      accessToken = await refreshToken();
-      options.headers["Authorization"] = `Bearer ${accessToken}`;
-      response = await fetch(url, options);
+      // If the token has expired, it tries to refresh it
+      const refreshed = await refreshToken();
+      if (refreshed) {
+        accessToken = getAccessToken();
+        options.headers["Authorization"] = `Bearer ${accessToken}`;
+        response = await fetch(url, options);
+      } else {
+        throw new Error("Unable to refresh token");
+      }
     }
     return response;
   } catch (error) {
@@ -172,4 +174,4 @@ export async function authenticatedFetch(url, options = {}) {
   }
 }
 
-export { setupLoginForm, setupRegisterForm };
+export { loginUser, authenticatedFetch, setupLoginForm, setupRegisterForm };

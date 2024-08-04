@@ -4,32 +4,23 @@ import {
   initFriendsComponent,
 } from "./views/userHomeView.js";
 import { setupLoginForm, setupRegisterForm } from "./auth.js";
+import { isAuthenticated, clearTokens } from "./sessionManager.js";
 
-function getUserIdFromLocalStorage() {
-  const token = localStorage.getItem("access");
-  if (!token) return null;
-  return localStorage.getItem("userId");
-}
-
-const isAuthenticated = () => {
-  return !!localStorage.getItem("access");
-};
-
+/**
+ * Main router function that handles navigation and renders the appropriate view.
+ */
 const router = async () => {
   const routes = [
     { path: "/", templateId: "template-index", requiresAuth: false },
     { path: "/login", templateId: "template-login", requiresAuth: false },
     { path: "/register", templateId: "template-register", requiresAuth: false },
-    { path: "/user/:id", templateId: "template-user-home", requiresAuth: true },
+    { path: "/home", templateId: "template-user-home", requiresAuth: true },
   ];
 
   if (location.pathname === "/") {
     if (isAuthenticated()) {
-      const userId = getUserIdFromLocalStorage();
-      if (userId) {
-        navigateTo(`/user/${userId}`);
-        return;
-      }
+      navigateTo(`/home`);
+      return;
     } else {
       navigateTo("/login");
       return;
@@ -38,27 +29,10 @@ const router = async () => {
 
   // Test each route for potential match
   const potentialMatches = routes.map((route) => {
-    const pathSegments = route.path
-      .split("/")
-      .filter((segment) => segment !== "");
-    const urlSegments = location.pathname
-      .split("/")
-      .filter((segment) => segment !== "");
-
-    if (pathSegments.length !== urlSegments.length) {
-      return { route, isMatch: false, params: {} };
-    }
-
-    const params = {};
-    const isMatch = pathSegments.every((segment, index) => {
-      if (segment.startsWith(":")) {
-        params[segment.slice(1)] = urlSegments[index];
-        return true;
-      }
-      return segment === urlSegments[index];
-    });
-
-    return { route, isMatch, params };
+    return {
+      route,
+      isMatch: location.pathname === route.path,
+    };
   });
 
   let match = potentialMatches.find((potentialMatch) => potentialMatch.isMatch);
@@ -85,11 +59,10 @@ const router = async () => {
   app.innerHTML = "";
   app.append(document.getElementById(templateId).content.cloneNode(true));
 
-  if (match.route.path === "/user/:id") {
-    const userId = match.params.id;
-    await loadHomePage(userId);
-    initTournamentsComponent(userId);
-    initFriendsComponent(userId);
+  if (match.route.path === "/home") {
+    await loadHomePage();
+    initTournamentsComponent();
+    initFriendsComponent();
   } else if (match.route.path === "/login") {
     setupLoginForm();
   } else if (match.route.path === "/register") {
@@ -97,13 +70,25 @@ const router = async () => {
   }
 };
 
+/**
+ * Navigates to the specified URL and triggers the router.
+ * @param {string} url - The URL to navigate to.
+ */
 const navigateTo = (url) => {
   history.pushState(null, null, url);
   router();
 };
 
-function navigateToUserPage(userId) {
-  navigateTo(`/user/${userId}`);
+/**
+ * Navigates to the user's home page.
+ */
+function navigateToUserPage() {
+  navigateTo(`/home`);
+}
+
+function logout() {
+  clearTokens();
+  navigateTo("/login");
 }
 
 export { router, navigateTo, navigateToUserPage };

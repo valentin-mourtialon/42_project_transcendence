@@ -5,8 +5,7 @@ import {
 } from "../fetch.js";
 
 export default class FriendsComponent {
-  constructor(userId) {
-    this.userId = userId;
+  constructor() {
     this.container = document.querySelector(".friends-container");
     this.tabButtons = this.container.querySelectorAll(".friends-tab");
     this.friendsList = document.getElementById("friends-list");
